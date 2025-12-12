@@ -5,10 +5,6 @@ const ReportScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text>report Page</Text>
-            <Button 
-                title="Go Back" 
-                onPress={() => navigation.goBack()}
-            />
         </View>
     );
 };

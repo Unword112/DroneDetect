@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 
-const AlertScreen = ({ navigation }) => {
+const CameraScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Text>alert Page</Text>
+            <Text>Camera Page</Text>
         </View>
     );
 };
@@ -28,4 +28,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AlertScreen;
+export default CameraScreen;

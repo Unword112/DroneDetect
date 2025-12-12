@@ -1,25 +1,26 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons'; 
 
 import AccountScreen from './pages/account';
 import AlertScreen from './pages/alert';
 import OptionScreen from './pages/option';
 import ReportScreen from './pages/report';
+import HomeScreen from './pages/home';
+import CameraScreen from './pages/camera';
+import EditZoneScreen from './pages/configscreen/editZone';
 
 import MenuPopover from './components/MenuPopover'; 
-import { Ionicons } from '@expo/vector-icons'; 
 
 function MenuButton() {
     const [isMenuVisible, setMenuVisible] = React.useState(false);
     const navigation = useNavigation();
 
     const toggleMenu = () => setMenuVisible(!isMenuVisible);
-
-    // ฟังก์ชันนำทางเมื่อเลือกเมนู
     const handleNavigate = (screenName) => {
-        navigation.navigate(screenName);
+        navigation.navigate(screenName); 
     };
 
     return (
@@ -29,13 +30,12 @@ function MenuButton() {
                 style={{ marginRight: 15 }}
             >
                 <Ionicons 
-                    name={Platform.OS === 'ios' ? 'ellipsis-vertical' : 'ellipsis-vertical-sharp'} 
+                    name={Platform.OS === 'ios' ? 'ellipsis-horizontal' : 'ellipsis-horizontal-sharp'} 
                     size={24} 
-                    color="white" 
+                    color="#000000ff" 
                 />
             </TouchableOpacity>
 
-            {/* Popover Menu Component */}
             <MenuPopover
                 isVisible={isMenuVisible}
                 onClose={() => setMenuVisible(false)}
@@ -51,26 +51,28 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName="Alert" 
-        screenOptions={({ navigation }) => ({
-          headerStyle: { backgroundColor: '#f4511e' },
-          headerTintColor: '#fff',
+        initialRouteName="Home" 
+        screenOptions={{
+          headerTransparent: true,
+          headerTintColor: '#000000ff',
           headerTitleStyle: { fontWeight: 'bold' },
-          
-          // กำหนดปุ่มเมนูสำหรับทุกหน้าจอ
           headerRight: () => <MenuButton />,
-        })}
+        }}
       >
-        <Stack.Screen name="Alert" component={AlertScreen} options={{ title: 'การแจ้งเตือน' }} />
-        <Stack.Screen name="Report" component={ReportScreen} options={{ title: 'รายงาน' }} />
-        <Stack.Screen name="Option" component={OptionScreen} options={{ title: 'ตัวเลือก' }} />
-        <Stack.Screen name="Account" component={AccountScreen} options={{ title: 'บัญชีผู้ใช้' }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: '' }} />
+
+        <Stack.Screen name="Alert" component={AlertScreen} options={{ title: '' }} />
+        <Stack.Screen name="Report" component={ReportScreen} options={{ title: '' }} />
+        <Stack.Screen name="Option" component={OptionScreen} options={{ title: '' }} />
+        <Stack.Screen name="Account" component={AccountScreen} options={{ title: '' }} />
+
+        <Stack.Screen name="Camera" component={CameraScreen} options={{ title: '' }} />
+        <Stack.Screen name="EditZone" component={EditZoneScreen} options={{ title: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-// Styles ที่เหลือ (ไม่ต้องเปลี่ยน)
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -5,10 +5,6 @@ const AccountScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text>account Page</Text>
-            <Button 
-                title="Go Back" 
-                onPress={() => navigation.goBack()}
-            />
         </View>
     );
 };

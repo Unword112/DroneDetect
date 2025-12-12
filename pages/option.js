@@ -5,10 +5,6 @@ const OptionScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text>option Page</Text>
-            <Button 
-                title="Go Back" 
-                onPress={() => navigation.goBack()}
-            />
         </View>
     );
 };
