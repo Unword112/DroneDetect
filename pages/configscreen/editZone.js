@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native'; // เพิ่ม Alert
 import MapView, { Polygon, Marker } from 'react-native-maps';
-
 import { currentMapRegion } from './locationStore';
 
-// ลบหลังจากได้ backend แล้ว
 const createSquare = (centerLat, centerLon, size) => {
     return [
         { latitude: centerLat + size, longitude: centerLon - size },
@@ -14,15 +12,15 @@ const createSquare = (centerLat, centerLon, size) => {
     ];
 };
 
-const EditZoneScreen = () => {
+const EditZoneScreen = ({ navigation }) => {
     const startLat = currentMapRegion?.latitude || 13.7850;
     const startLon = currentMapRegion?.longitude || 100.5500;
 
     const [defenseCoords, setDefenseCoords] = useState(
-        createSquare(startLat, startLon, 0.001) // สีแดง
+        createSquare(startLat, startLon, 0.001) 
     );
     const [alertCoords, setAlertCoords] = useState(
-        createSquare(startLat, startLon, 0.002) // สีฟ้า
+        createSquare(startLat, startLon, 0.002) 
     );
 
     const onMarkerDragEnd = (index, newCoordinate, type) => {
@@ -37,6 +35,33 @@ const EditZoneScreen = () => {
         }
     };
 
+    // 1. ฟังก์ชันบันทึกข้อมูล
+    const handleSave = async () => {
+        try {
+            const response = await fetch('http://172.20.10.2:3000/api/update-zones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    defenseZone: defenseCoords,
+                    alertZone: alertCoords,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Alert.alert("สำเร็จ", "บันทึกโซนเรียบร้อยแล้ว", [
+                    { text: "OK", onPress: () => navigation.goBack() } // บันทึกเสร็จให้กลับไปหน้าเดิม
+                ]);
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "ไม่สามารถเชื่อมต่อ Server ได้");
+        }
+    };
+
     return (
         <View style={styles.container}>
             <MapView
@@ -48,47 +73,28 @@ const EditZoneScreen = () => {
                     longitudeDelta: 0.01,
                 }}
             >
-                {/* --- โซนสีฟ้า --- */}
-                <Polygon
-                    coordinates={alertCoords}
-                    strokeColor="#4AC2F9"
-                    fillColor="rgba(74, 194, 249, 0.2)"
-                    strokeWidth={2}
-                />
+                <Polygon coordinates={alertCoords} strokeColor="#4AC2F9" fillColor="rgba(74, 194, 249, 0.2)" strokeWidth={2} />
                 {alertCoords.map((coord, index) => (
-                    <Marker
-                        key={`alert-${index}`}
-                        coordinate={coord}
-                        draggable
-                        anchor={{ x: 0.5, y: 0.5 }}
-                        onDragEnd={(e) => onMarkerDragEnd(index, e.nativeEvent.coordinate, 'alert')}
-                    >
+                    <Marker key={`alert-${index}`} coordinate={coord} draggable anchor={{ x: 0.5, y: 0.5 }} onDragEnd={(e) => onMarkerDragEnd(index, e.nativeEvent.coordinate, 'alert')}>
                         <View style={[styles.editDot, { backgroundColor: '#4AC2F9' }]} />
                     </Marker>
                 ))}
 
-                {/* --- โซนสีแดง --- */}
-                <Polygon
-                    coordinates={defenseCoords}
-                    strokeColor="#FF4500"
-                    fillColor="rgba(255, 69, 0, 0.3)"
-                    strokeWidth={2}
-                />
+                <Polygon coordinates={defenseCoords} strokeColor="#FF4500" fillColor="rgba(255, 69, 0, 0.3)" strokeWidth={2} />
                 {defenseCoords.map((coord, index) => (
-                    <Marker
-                        key={`defense-${index}`}
-                        coordinate={coord}
-                        draggable
-                        anchor={{ x: 0.5, y: 0.5 }}
-                        onDragEnd={(e) => onMarkerDragEnd(index, e.nativeEvent.coordinate, 'defense')}
-                    >
+                    <Marker key={`defense-${index}`} coordinate={coord} draggable anchor={{ x: 0.5, y: 0.5 }} onDragEnd={(e) => onMarkerDragEnd(index, e.nativeEvent.coordinate, 'defense')}>
                         <View style={[styles.editDot, { backgroundColor: '#FF4500' }]} />
                     </Marker>
                 ))}
             </MapView>
 
-            <View style={styles.instructions}>
-                <Text style={styles.text}>ปรับแต่งพื้นที่โซนของคุณ</Text>
+            <View style={styles.bottomContainer}>
+                <Text style={styles.text}>ลากจุดเพื่อปรับแต่งพื้นที่</Text>
+
+                {/* 2. ปุ่มบันทึก */}
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveButtonText}>บันทึกโซน (Save)</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -103,11 +109,19 @@ const styles = StyleSheet.create({
         shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25, elevation: 5,
     },
-    instructions: {
-        position: 'absolute', bottom: 40, alignSelf: 'center',
-        backgroundColor: 'rgba(0,0,0,0.7)', padding: 10, borderRadius: 20,
+    bottomContainer: {
+        position: 'absolute', bottom: 40, alignSelf: 'center', alignItems: 'center'
     },
-    text: { color: 'white', fontWeight: 'bold' }
+    text: { 
+        color: 'white', fontWeight: 'bold', marginBottom: 10,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)', textShadowOffset: {width: -1, height: 1}, textShadowRadius: 10
+    },
+    saveButton: {
+        backgroundColor: '#28a745',
+        paddingHorizontal: 30, paddingVertical: 15, borderRadius: 25,
+        elevation: 5,
+    },
+    saveButtonText: { color: 'white', fontWeight: 'bold', fontSize: 18 }
 });
 
 export default EditZoneScreen;

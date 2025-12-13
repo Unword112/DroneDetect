@@ -3,11 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 
 const MenuPopover = ({ isVisible, onClose, onNavigate }) => {
     const menuItems = [
+        { name: 'EditZone', label: 'Edit Zone' },
         { name: 'Alert', label: 'Alert' },
         { name: 'Report', label: 'Report' },
         { name: 'Option', label: 'Option' },
         { name: 'Account', label: 'Account' },
-        { name: 'EditZone', label: 'Edit Zone' },
     ];
 
     const handlePress = (screenName) => {
