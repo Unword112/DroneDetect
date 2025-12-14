@@ -15,6 +15,12 @@ let initialMapRegion = {
 };
 
 //รอ database ตัวนี้ตัวแปรชั่วคราว
+let mockDroneDetail = [
+    { id: 14, name: 'TARGET 14', distance: 170.49, speed: 14, POI: 20, Altitude: 70, Heading: 85, ReachIn: 3 },
+    { id: 15, name: 'TARGET 15', distance: 210.74, speed: 14, POI: 20, Altitude: 250, Heading: 111, ReachIn: 15 }
+]
+
+//รอ database ตัวนี้ตัวแปรชั่วคราว
 let mockDroneData = [
     { id: 14, name: 'TARGET 14', distance: 170.49, lat: 13.7845, lon: 100.5510 }, 
     { id: 15, name: 'TARGET 15', distance: 210.74, lat: 13.7880, lon: 100.5480 }, 
@@ -43,7 +49,9 @@ app.get('/api/home-data', (req, res) => {
         drones: mockDroneData,
         defenseZone: defenseBoundaryCoords,
         alertZone: alertZoneCoords,
-        initialRegion: initialMapRegion
+        initialRegion: initialMapRegion,
+        detail: mockDroneDetail
+
     });
 });
 

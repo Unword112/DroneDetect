@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform, View, Text } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons'; 
+
+import { subscribe, getUnreadCount } from './pages/configscreen/alertStore';
 
 import AccountScreen from './pages/account';
 import AlertScreen from './pages/alert';
@@ -18,30 +20,43 @@ function MenuButton() {
     const [isMenuVisible, setMenuVisible] = React.useState(false);
     const navigation = useNavigation();
 
+    const [unreadCount, setUnreadCount] = React.useState(getUnreadCount());
+
+    React.useEffect(() => {
+        const unsubscribe = subscribe(() => {
+            setUnreadCount(getUnreadCount());
+        });
+        return unsubscribe;
+    }, []);
+
     const toggleMenu = () => setMenuVisible(!isMenuVisible);
     const handleNavigate = (screenName) => {
         navigation.navigate(screenName); 
     };
 
     return (
-        <>
-            <TouchableOpacity 
-                onPress={toggleMenu} 
-                style={{ marginRight: 15 }}
-            >
+        <View style={{ marginRight: 15 }}>
+            <TouchableOpacity onPress={toggleMenu}>
                 <Ionicons 
                     name={Platform.OS === 'ios' ? 'ellipsis-horizontal' : 'ellipsis-horizontal-sharp'} 
                     size={24} 
                     color="#000000ff" 
                 />
+                
+                {unreadCount > 0 && (
+                    <View style={styles.exclamationBadge}>
+                        <Text style={styles.exclamationText}>!</Text>
+                    </View>
+                )}
             </TouchableOpacity>
 
             <MenuPopover
                 isVisible={isMenuVisible}
                 onClose={() => setMenuVisible(false)}
                 onNavigate={handleNavigate}
+                alertCount={unreadCount} 
             />
-        </>
+        </View>
     );
 }
 
@@ -85,4 +100,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '600',
   },
+  exclamationBadge: {
+      position: 'absolute',
+      right: -5,
+      top: -5,
+      backgroundColor: 'red',
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1.5,
+      borderColor: 'white'
+  },
+  exclamationText: {
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 'bold',
+  }
 });
