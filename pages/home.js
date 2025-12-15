@@ -76,7 +76,7 @@ const HomeScreen = ({ navigation }) => {
                         
                         if (isInRedZone) {
                             if (!alertedDrones.current.has(drone.id)) {
-                                console.log(`🚨 Alert! Drone ${drone.name} entered red zone!`);
+                                console.log(`Alert! Drone ${drone.name} entered red zone`);
                                 addAlert(drone.name);
                                 alertedDrones.current.add(drone.id);
                             }
