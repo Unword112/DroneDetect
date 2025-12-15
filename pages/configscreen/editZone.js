@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'rea
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import { currentMapRegion } from './locationStore';
 
+import { IP_HOST } from '@env';
+
+const API_URL = `http://${IP_HOST}:3000/api/update-zones`;
+
 const createSquare = (centerLat, centerLon, size) => {
     return [
         { latitude: centerLat + size, longitude: centerLon - size },
@@ -38,7 +42,7 @@ const EditZoneScreen = ({ navigation }) => {
     // 1. ฟังก์ชันบันทึกข้อมูล
     const handleSave = async () => {
         try {
-            const response = await fetch('http://172.20.10.2:3000/api/update-zones', {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,7 +95,6 @@ const EditZoneScreen = ({ navigation }) => {
             <View style={styles.bottomContainer}>
                 <Text style={styles.text}>ลากจุดเพื่อปรับแต่งพื้นที่</Text>
 
-                {/* 2. ปุ่มบันทึก */}
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>บันทึกโซน (Save)</Text>
                 </TouchableOpacity>
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0, 0, 0, 0.75)', textShadowOffset: {width: -1, height: 1}, textShadowRadius: 10
     },
     saveButton: {
-        backgroundColor: '#28a745',
+        backgroundColor: '#007AFF',
         paddingHorizontal: 30, paddingVertical: 15, borderRadius: 25,
         elevation: 5,
     },
