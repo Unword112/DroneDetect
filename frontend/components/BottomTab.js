@@ -17,6 +17,7 @@ const BottomTab = ({ navigation }) => {
 
   const menus = [
     { name: "Home", icon: "home", route: "Home" },
+    { name: "Edit Zone", icon: "create", route: "EditZone" },
     { name: "Alert", icon: "notifications", route: "Alert", hasBadge: true },
     { name: "Report", icon: "document-text", route: "Report" },
     { name: "Option", icon: "settings", route: "Option" },

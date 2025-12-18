@@ -109,6 +109,20 @@ const HomeScreen = ({ navigation }) => {
     if (isTablet && sidebarLevel < 2) setSidebarLevel(2);
   };
 
+  const getActiveCameraDrone = () => {
+    if (selectedDrone) return selectedDrone;
+
+    if (drones.length > 0) {
+      return drones.reduce((prev, curr) =>
+        prev.distance < curr.distance ? prev : curr,
+      );
+    }
+
+    return null;
+  };
+
+  const activeCameraDrone = getActiveCameraDrone();
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -131,17 +145,52 @@ const HomeScreen = ({ navigation }) => {
         <View style={{ flex: 1, flexDirection: "row" }}>
           {sidebarLevel >= 1 && (
             <View style={styles.tabletColList}>
+              {/* ส่วน Header */}
               <View style={styles.columnHeader}>
                 <Text style={styles.headerText}>Drone Detected</Text>
                 <TouchableOpacity onPress={() => setSidebarLevel(0)}>
                   <Ionicons name="chevron-back-circle" size={24} color="#999" />
                 </TouchableOpacity>
               </View>
-              <DroneList
-                drones={drones}
-                selectedDrone={selectedDrone}
-                onSelect={handleDroneSelect}
-              />
+
+              <View style={{ flex: 1 }}>
+                <DroneList
+                  drones={drones}
+                  selectedDrone={selectedDrone}
+                  onSelect={handleDroneSelect}
+                />
+              </View>
+
+              <View style={styles.liveCameraBox}>
+                <View style={styles.liveHeader}>
+                  <View style={styles.redDot} />
+                  <Text style={styles.liveText}>
+                    {selectedDrone ? "LIVE FEED" : "AUTO TRACKING"}
+                  </Text>
+                </View>
+
+                {activeCameraDrone && activeCameraDrone.imageUrl ? (
+                  <>
+                    <Image
+                      source={{ uri: activeCameraDrone.imageUrl }}
+                      style={styles.liveImage}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.cameraLabelOverlay}>
+                      <Text style={styles.cameraLabelText}>
+                        {activeCameraDrone.name} ({activeCameraDrone.distance}m)
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <View style={styles.noSignalBox}>
+                    <Ionicons name="videocam-off" size={30} color="#ccc" />
+                    <Text style={{ color: "#999", marginTop: 5, fontSize: 10 }}>
+                      NO SIGNAL
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           )}
 
@@ -166,7 +215,6 @@ const HomeScreen = ({ navigation }) => {
                 <Ionicons name="list" size={24} color="#007AFF" />
               </TouchableOpacity>
             )}
-
             <DroneMap
               style={{ width: "100%", height: "100%" }}
               drones={drones}
@@ -259,6 +307,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderColor: "#eee",
     backgroundColor: "#fff",
+    justifyContent: "space-between",
   },
   tabletColDetail: {
     flex: 3,
@@ -266,6 +315,40 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderColor: "#eee",
     backgroundColor: "#fff",
+  },
+  liveCameraBox: {
+    height: 180,
+    backgroundColor: "#000",
+    borderRadius: 12,
+    marginTop: 15,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    position: "relative",
+  },
+  liveImage: {
+    width: "100%",
+    height: "100%",
+  },
+  noSignalBox: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+  },
+  cameraLabelOverlay: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  cameraLabelText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
   },
 
   sidebarToggleBtn: {
@@ -284,8 +367,15 @@ const styles = StyleSheet.create({
   },
 
   // Mobile
-  mapMobile: { width: Dimensions.get("window").width, height: "70%" },
-  infoContainerMobile: { height: "30%", padding: 15, backgroundColor: "#fff" },
+  mapMobile: { 
+    width: Dimensions.get("window").width, 
+    height: "70%" 
+  },
+  infoContainerMobile: { 
+    height: "30%", 
+    padding: 15, 
+    backgroundColor: "#fff" 
+  },
   cameraButtonMobile: {
     backgroundColor: "#007AFF",
     padding: 15,

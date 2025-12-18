@@ -1,282 +1,184 @@
 import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  ActivityIndicator,
-  Modal,
+import { 
+    View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, 
+    useWindowDimensions, Platform, Image
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { IP_HOST } from "@env"; // เรียกใช้ IP จาก .env
+import { Ionicons } from '@expo/vector-icons';
 
-// URL ของ API
+import DroneList from "../components/DroneList";
+import DroneDetail from "../components/DroneDetail";
+import BottomTab from "../components/BottomTab";
+
+import { IP_HOST } from "@env";
+
 const API_URL = `http://${IP_HOST}:3000/api/home-data`;
+const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live?t=${new Date().getTime()}`;
 
 const CameraScreen = ({ navigation }) => {
-  const headerHeight = useHeaderHeight();
+    const headerHeight = useHeaderHeight();
+    const { width } = useWindowDimensions();
+    const isTablet = width >= 768;
 
-  // State สำหรับเก็บข้อมูลต่างๆ
-  const [drones, setDrones] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDrone, setSelectedDrone] = useState(null);
-  const [allDroneDetails, setAllDroneDetails] = useState([]);
+    const [drones, setDrones] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedDrone, setSelectedDrone] = useState(null);
+    const [allDroneDetails, setAllDroneDetails] = useState([]);
+    
+    const [sidebarLevel, setSidebarLevel] = useState(2);
 
-  // ดึงข้อมูลเมื่อหน้านี้ถูกเปิด (เหมือนหน้า Home)
-  useFocusEffect(
-    useCallback(() => {
-      const fetchHomeData = async () => {
-        try {
-          const response = await fetch(API_URL);
-          const data = await response.json();
+    useFocusEffect(
+        useCallback(() => {
+            const fetchCameraData = async () => {
+                try {
+                    const response = await fetch(API_URL);
+                    const data = await response.json();
+                    
+                    setDrones(data.drones); 
+                    setAllDroneDetails(data.detail);
+                    setLoading(false);
 
-          // ในหน้ากล้อง เราอาจจะแสดงโดรนทั้งหมดที่ server ส่งมา
-          // โดยไม่ต้องกรอง zone ก็ได้ หรือจะกรองก็ได้แล้วแต่ logic ที่ต้องการ
-          setDrones(data.drones);
-
-          if (data.detail) {
-            setAllDroneDetails(data.detail);
-          }
-          setLoading(false);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setLoading(false);
-        }
-      };
-
-      fetchHomeData();
-      return () => {};
-    }, []),
-  );
-
-  // ฟังก์ชันเมื่อกดเลือกโดรน (เหมือนหน้า Home)
-  const handleDronePress = (basicDroneData) => {
-    const detailData = allDroneDetails.find((d) => d.id === basicDroneData.id);
-    if (detailData) {
-      setSelectedDrone({
-        ...detailData,
-        lat: basicDroneData.lat,
-        lon: basicDroneData.lon,
-      });
-    } else {
-      setSelectedDrone(basicDroneData);
-    }
-    setModalVisible(true);
-  };
-
-  // แสดง Loading ระหว่างรอข้อมูล
-  if (loading) {
-    return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-      >
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text>กำลังโหลดข้อมูล...</Text>
-      </View>
+                } catch (error) {
+                    console.error("Error fetching camera data:", error);
+                    setLoading(false);
+                }
+            };
+            
+            const interval = setInterval(fetchCameraData, 2000);
+            fetchCameraData();
+            return () => clearInterval(interval);
+        }, [])
     );
-  }
 
-  return (
-    <View style={styles.container}>
-      {/* --- ส่วนบน: Placeholder สำหรับกล้อง --- */}
-      <View style={[styles.cameraPlaceholder, { marginTop: headerHeight }]}>
-        <Text style={styles.cameraText}>wait camera</Text>
-      </View>
+    const handleDroneSelect = (basicDroneData) => {
+        const detailData = allDroneDetails.find((d) => d.id === basicDroneData.id);
+        const mergedData = detailData ? { ...detailData, ...basicDroneData } : basicDroneData;
+        setSelectedDrone(mergedData);
+        
+        if (isTablet && sidebarLevel < 2) setSidebarLevel(2);
+    };
 
-      <View style={styles.infoContainer}>
-        <View style={styles.listContainer}>
-          <Text style={styles.headerText}>DRONE DETECTED</Text>
-          {drones.map((drone) => (
-            <TouchableOpacity
-              key={drone.id}
-              onPress={() => handleDronePress(drone)}
-            >
-              <View style={styles.listItem}>
-                <Text style={styles.targetText}>{drone.name}</Text>
-                <Text style={styles.distanceText}>{drone.distance} m</Text>
-                <View style={styles.indicator} />
-              </View>
-            </TouchableOpacity>
-          ))}
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text>Connecting to Camera Feed...</Text>
+            </View>
+        );
+    }
+
+    const renderCameraView = () => (
+        <View style={styles.cameraContainer}>
+            <Image
+                source={{ uri: CAMERA_FEED_URL }}
+                style={styles.cameraImage}
+                resizeMode="cover"
+            />
+            
+            <View style={styles.statusOverlay}>
+                <View style={styles.redDot} />
+                <Text style={styles.statusText}>LIVE</Text>
+            </View>
         </View>
-        <TouchableOpacity
-          style={styles.cameraButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.cameraButtonText}>Back</Text>
-        </TouchableOpacity>
-      </View>
+    );
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalIndicator} />
-            {selectedDrone && (
-              <>
-                <Text style={styles.modalHeader}>DRONE DETECTED</Text>
-                <Text style={styles.modalTitle}>{selectedDrone.name}</Text>
-                <View style={styles.divider} />
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>DISTANCE</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.distance} m
-                  </Text>
+    // --- Layout for Tablet ---
+    if (isTablet) {
+        return (
+            <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Platform.OS === 'android' ? 30 : 0 }}>
+                <View style={{ flex: 1, flexDirection: "row" }}>
+                    
+                    {sidebarLevel >= 1 && (
+                        <View style={styles.tabletColList}>
+                            <View style={styles.columnHeader}>
+                                <Text style={styles.headerText}>Drone Detected</Text>
+                                <TouchableOpacity onPress={() => setSidebarLevel(0)}>
+                                    <Ionicons name="chevron-back-circle" size={24} color="#999" />
+                                </TouchableOpacity>
+                            </View>
+                            <DroneList 
+                                drones={drones} 
+                                selectedDrone={selectedDrone} 
+                                onSelect={handleDroneSelect} 
+                            />
+                        </View>
+                    )}
+
+                    {sidebarLevel >= 2 && (
+                        <View style={styles.tabletColDetail}>
+                            <View style={styles.columnHeader}>
+                                <Text style={styles.headerText}>Detail</Text>
+                                <TouchableOpacity onPress={() => setSidebarLevel(1)}>
+                                    <Ionicons name="chevron-back-circle" size={24} color="#999" />
+                                </TouchableOpacity>
+                            </View>
+                            <DroneDetail drone={selectedDrone} />
+                        </View>
+                    )}
+
+                    <View style={{ flex: 5, position: 'relative', backgroundColor: 'black' }}>
+                        {sidebarLevel === 0 && (
+                            <TouchableOpacity style={styles.sidebarToggleBtn} onPress={() => setSidebarLevel(2)}>
+                                <Ionicons name="list" size={24} color="#007AFF" />
+                            </TouchableOpacity>
+                        )}
+                        
+                        {renderCameraView()}
+                    </View>
                 </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Location</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.lat ? selectedDrone.lat.toFixed(6) : "-"},{" "}
-                    {selectedDrone.lon ? selectedDrone.lon.toFixed(6) : "-"}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Speed</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.speed} m/s
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>POI</Text>
-                  <Text style={styles.detailValue}>{selectedDrone.POI} m</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Altitude</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.Altitude} m
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Heading</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.Heading}°
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Reach in</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedDrone.ReachIn} sec
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={{ color: "#666" }}>Close</Text>
+
+                <BottomTab navigation={navigation} />
+            </View>
+        );
+    }
+
+    return (
+        <View style={styles.container}>
+            <View style={{ flex: 1 }}>
+                {renderCameraView()}
+                 <TouchableOpacity style={styles.backButtonMobile} onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
-              </>
-            )}
-          </View>
+            </View>
         </View>
-      </Modal>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  cameraPlaceholder: {
-    width: Dimensions.get("window").width,
-    height: "70%",
-    backgroundColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cameraText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  infoContainer: { height: "30%", padding: 15, backgroundColor: "#fff" },
-  listContainer: { flex: 1 },
-  headerText: {
-    fontSize: 12,
-    color: "#868686",
-    fontWeight: "500",
-    marginBottom: 10,
-  },
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  targetText: { fontSize: 16, fontWeight: "600", flex: 1 },
-  distanceText: { fontSize: 16, fontWeight: "600", marginRight: 10 },
-  indicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#4AC2F9",
-  },
-  cameraButton: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  cameraButtonText: { color: "white", fontSize: 18, fontWeight: "bold" },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    minHeight: 400,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalIndicator: {
-    width: 40,
-    height: 5,
-    backgroundColor: "#ccc",
-    borderRadius: 3,
-    alignSelf: "center",
-    marginBottom: 15,
-  },
-  modalHeader: {
-    fontSize: 12,
-    color: "#868686",
-    fontWeight: "500",
-    textTransform: "uppercase",
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "black",
-    marginVertical: 5,
-  },
-  divider: { height: 1, backgroundColor: "#eee", marginVertical: 15 },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  detailLabel: { fontSize: 16, color: "#333" },
-  detailValue: { fontSize: 16, fontWeight: "600", color: "black" },
-  closeButton: { alignItems: "center", padding: 15, marginTop: 10 },
+    container: { flex: 1, backgroundColor: "#000" },
+    loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+    
+    tabletColList: { flex: 2, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
+    tabletColDetail: { flex: 3, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
+    
+    columnHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+    headerText: { fontSize: 16, fontWeight: "bold", color: "black" },
+    
+    sidebarToggleBtn: {
+        position: 'absolute', top: 20, left: 20, zIndex: 20,
+        backgroundColor: 'white', padding: 10, borderRadius: 8,
+        shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, elevation: 4,
+    },
+
+    cameraContainer: { 
+        width: '100%', 
+        height: '100%', 
+        backgroundColor: 'black',
+        justifyContent: 'center', 
+        alignItems: 'center' 
+    },
+    waitText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textTransform: 'lowercase'
+    },
+
+    backButtonMobile: {
+        position: 'absolute', top: 40, left: 20,
+        backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 20
+    }
 });
 
 export default CameraScreen;

@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const app = express();
 const port = 3000;
 
@@ -13,8 +14,8 @@ const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
 let initialMapRegion = {
   latitude: 13.785,
   longitude: 100.55,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
+  latitudeDelta: 0.007,
+  longitudeDelta: 0.007,
 };
 
 //รอ database ตัวนี้ตัวแปรชั่วคราว
@@ -22,7 +23,7 @@ let mockDroneDetail = [
   {
     id: 14,
     name: "TARGET 14",
-    distance: 170.49,
+    distance: 40.49,
     speed: 14,
     POI: 20,
     Altitude: 70,
@@ -49,7 +50,7 @@ let mockDroneData = [
     distance: mockDroneDetail[0].distance,
     lat: 13.7845,
     lon: 100.551,
-    imageUrl: 'https://img.freepik.com/free-photo/white-drone-hovering-bright-blue-sky_158595-3356.jpg'
+    imageUrl: 'http://10.0.2.2:3000/images/drone_1.jpg'
   },
   {
     id: mockDroneDetail[1].id,
@@ -57,7 +58,7 @@ let mockDroneData = [
     distance: mockDroneDetail[1].distance,
     lat: 13.788,
     lon: 100.548,
-    imageUrl: 'https://t3.ftcdn.net/jpg/02/39/37/80/360_F_239378037_L5i7D8b7i7v2K2D5g1F4x5q8q8q8q8q8.jpg'
+    imageUrl: 'http://10.0.2.2:3000/images/drone_2.jpg'
   },
 ];
 
@@ -157,6 +158,15 @@ app.get("/api/report-data", (req, res) => {
     },
     topOffenders: topOffenders,
   });
+});
+
+app.get('/api/camera-live', (req, res) => {
+    // จำลองว่า Server กำลังไปดึงภาพมาจากตัวกล้อง (จริงๆ คืออ่านจากไฟล์)
+    // คุณสามารถเปลี่ยน logic ตรงนี้ให้สุ่มภาพ camera_1.jpg หรือ camera_2.jpg ก็ได้
+    const cameraImage = 'camera_1.jpg'; 
+    const imagePath = path.join(__dirname, 'images', cameraImage);
+    
+    res.sendFile(imagePath);
 });
 
 app.listen(port, () => {

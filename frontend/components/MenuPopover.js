@@ -32,48 +32,35 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={styles.popoverContainer}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => onNavigate("EditZone")}
-            >
-              <Text style={styles.menuText}>Edit Zone</Text>
-            </TouchableOpacity>
+            
+            {/* 3. ใช้ .map() วนลูปสร้างเมนูแทนการเขียนซ้ำๆ */}
+            {menuItems.map((item, index) => {
+              // เช็คว่าเป็นตัวสุดท้ายไหม (เพื่อเอาเส้นขีดด้านล่างออก)
+              const isLastItem = index === menuItems.length - 1;
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => onNavigate("Alert")}
-            >
-              <View style={styles.rowBetween}>
-                <Text style={styles.menuText}>Alert</Text>
+              return (
+                <TouchableOpacity
+                  key={item.name}
+                  style={[
+                    styles.menuItem,
+                    isLastItem && { borderBottomWidth: 0 }, // ถ้าตัวสุดท้ายไม่ต้องมีเส้น
+                  ]}
+                  onPress={() => handlePress(item.name)}
+                >
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.menuText}>{item.label}</Text>
 
-                {alertCount > 0 && (
-                  <View style={styles.alertBadge}>
-                    <Text style={styles.alertBadgeText}>{alertCount}</Text>
+                    {/* แสดง Badge แจ้งเตือนเฉพาะเมนู Alert */}
+                    {item.name === "Alert" && alertCount > 0 && (
+                      <View style={styles.alertBadge}>
+                        <Text style={styles.alertBadgeText}>{alertCount}</Text>
+                      </View>
+                    )}
                   </View>
-                )}
-              </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+              );
+            })}
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => onNavigate("Report")}
-            >
-              <Text style={styles.menuText}>Report</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => onNavigate("Option")}
-            >
-              <Text style={styles.menuText}>Option</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.menuItem, { borderBottomWidth: 0 }]}
-              onPress={() => onNavigate("Account")}
-            >
-              <Text style={styles.menuText}>Account</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </TouchableWithoutFeedback>
