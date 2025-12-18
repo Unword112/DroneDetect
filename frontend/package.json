@@ -45,6 +45,7 @@
   },
   "homepage": "https://github.com/Unword112/DroneDetect#readme",
   "devDependencies": {
+    "prettier": "^3.7.4",
     "react-native-dotenv": "^3.4.11"
   }
 }
