@@ -160,9 +160,14 @@ app.get("/api/report-data", (req, res) => {
   });
 });
 
+app.get('./api/side-camera', (req, res) => {
+  const sideCamera = mockDroneData.imageUrl;
+  const imagePath = path.join(__dirname, 'images', sideCamera);
+
+  res.sendFile(imagePath);
+})
+
 app.get('/api/camera-live', (req, res) => {
-    // จำลองว่า Server กำลังไปดึงภาพมาจากตัวกล้อง (จริงๆ คืออ่านจากไฟล์)
-    // คุณสามารถเปลี่ยน logic ตรงนี้ให้สุ่มภาพ camera_1.jpg หรือ camera_2.jpg ก็ได้
     const cameraImage = 'camera_1.jpg'; 
     const imagePath = path.join(__dirname, 'images', cameraImage);
     
