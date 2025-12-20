@@ -25,6 +25,7 @@ import { addAlert } from "./configscreen/alertStore";
 import { IP_HOST } from "@env";
 
 const API_URL = `http://${IP_HOST}:3000/api/home-data`;
+const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
 
 const isPointInPolygon = (point, polygon) => {
   const x = point.lat;
@@ -57,6 +58,15 @@ const HomeScreen = ({ navigation }) => {
   const [allDroneDetails, setAllDroneDetails] = useState([]);
   const alertedDrones = useRef(new Set());
   const [sidebarLevel, setSidebarLevel] = useState(2);
+  const [camKey, setCamKey] = useState(Date.now());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCamKey(Date.now()); 
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -135,17 +145,11 @@ const HomeScreen = ({ navigation }) => {
   // Teblet
   if (isTablet) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#fff",
-          paddingTop: Platform.OS === "android" ? 30 : 0,
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: "#fff", paddingTop: Platform.OS === "android" ? 30 : 0 }}>
         <View style={{ flex: 1, flexDirection: "row" }}>
           {sidebarLevel >= 1 && (
             <View style={styles.tabletColList}>
-              {/* ส่วน Header */}
+              {/* Header */}
               <View style={styles.columnHeader}>
                 <Text style={styles.headerText}>Drone Detected</Text>
                 <TouchableOpacity onPress={() => setSidebarLevel(0)}>
@@ -154,13 +158,10 @@ const HomeScreen = ({ navigation }) => {
               </View>
 
               <View style={{ flex: 1 }}>
-                <DroneList
-                  drones={drones}
-                  selectedDrone={selectedDrone}
-                  onSelect={handleDroneSelect}
-                />
+                <DroneList drones={drones} selectedDrone={selectedDrone} onSelect={handleDroneSelect} />
               </View>
 
+              {/* ✅ Live Camera Box (แก้ไขให้ใช้ API) */}
               <View style={styles.liveCameraBox}>
                 <View style={styles.liveHeader}>
                   <View style={styles.redDot} />
@@ -169,32 +170,26 @@ const HomeScreen = ({ navigation }) => {
                   </Text>
                 </View>
 
-                {activeCameraDrone && activeCameraDrone.imageUrl ? (
-                  <>
-                    <Image
-                      source={{ uri: activeCameraDrone.imageUrl }}
-                      style={styles.liveImage}
-                      resizeMode="cover"
-                    />
+                {/* แสดงรูปจาก API เสมอ */}
+                <Image
+                    // ใส่ t=Timestamp เพื่อบังคับให้โหลดรูปใหม่ (ถ้า Server เปลี่ยนรูป)
+                    source={{ uri: `${SIDE_CAMERA_URL}?t=${new Date().getTime()}` }} 
+                    style={styles.liveImage}
+                    resizeMode="cover"
+                />
+                
+                {selectedDrone && (
                     <View style={styles.cameraLabelOverlay}>
                       <Text style={styles.cameraLabelText}>
-                        {activeCameraDrone.name} ({activeCameraDrone.distance}m)
+                        {selectedDrone.name}
                       </Text>
                     </View>
-                  </>
-                ) : (
-                  <View style={styles.noSignalBox}>
-                    <Ionicons name="videocam-off" size={30} color="#ccc" />
-                    <Text style={{ color: "#999", marginTop: 5, fontSize: 10 }}>
-                      NO SIGNAL
-                    </Text>
-                  </View>
                 )}
               </View>
             </View>
           )}
 
-          {sidebarLevel >= 2 && (
+           {sidebarLevel >= 2 && (
             <View style={styles.tabletColDetail}>
               <View style={styles.columnHeader}>
                 <Text style={styles.headerText}>Detail</Text>
@@ -208,10 +203,7 @@ const HomeScreen = ({ navigation }) => {
 
           <View style={{ flex: 5, position: "relative" }}>
             {sidebarLevel === 0 && (
-              <TouchableOpacity
-                style={styles.sidebarToggleBtn}
-                onPress={() => setSidebarLevel(2)}
-              >
+              <TouchableOpacity style={styles.sidebarToggleBtn} onPress={() => setSidebarLevel(2)}>
                 <Ionicons name="list" size={24} color="#007AFF" />
               </TouchableOpacity>
             )}
@@ -227,7 +219,6 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
         </View>
-
         <BottomTab navigation={navigation} />
       </View>
     );

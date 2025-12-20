@@ -7,6 +7,8 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 const days = ["Sun", "Mon", "Tue", "Wed", "The", "Fri", "Sat"];
 const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
 
@@ -102,7 +104,6 @@ let droneHistoryLogs = mockDroneData.map((drone) => ({
 }));
 
 //Endpoints
-
 //drone data
 app.get("/api/home-data", (req, res) => {
   res.json({
@@ -160,18 +161,20 @@ app.get("/api/report-data", (req, res) => {
   });
 });
 
-app.get('./api/side-camera', (req, res) => {
-  const sideCamera = mockDroneData.imageUrl;
-  const imagePath = path.join(__dirname, 'images', sideCamera);
-
-  res.sendFile(imagePath);
-})
+app.get('/api/side-camera', (req, res) => {
+  const imagePath = path.join(__dirname, 'images', 'drone_1.jpg');
+  
+  res.sendFile(imagePath, (err) => {
+      if (err) console.error("Error sending side-camera image:", err);
+  });
+});
 
 app.get('/api/camera-live', (req, res) => {
-    const cameraImage = 'camera_1.jpg'; 
-    const imagePath = path.join(__dirname, 'images', cameraImage);
+    const imagePath = path.join(__dirname, 'images', 'camera_1.jpg');
     
-    res.sendFile(imagePath);
+    res.sendFile(imagePath, (err) => {
+      if (err) console.error("Error sending camera-live image:", err);
+    });
 });
 
 app.listen(port, () => {

@@ -14,7 +14,7 @@ import BottomTab from "../components/BottomTab";
 import { IP_HOST } from "@env";
 
 const API_URL = `http://${IP_HOST}:3000/api/home-data`;
-const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live?t=${new Date().getTime()}`;
+const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
 
 const CameraScreen = ({ navigation }) => {
     const headerHeight = useHeaderHeight();
@@ -27,24 +27,29 @@ const CameraScreen = ({ navigation }) => {
     const [allDroneDetails, setAllDroneDetails] = useState([]);
     
     const [sidebarLevel, setSidebarLevel] = useState(2);
+    const [camKey, setCamKey] = useState(Date.now());
 
+    React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCamKey(Date.now()); // เปลี่ยนค่า camKey เพื่อให้ Image รู้ว่าต้องโหลดใหม่
+    }, 1000); // <-- ปรับเลขนี้ได้ (1000 = 1 วินาที) ถ้าอยากให้ลื่นขึ้นลอง 500 หรือ 200
+
+    return () => clearInterval(interval);
+  }, []);
     useFocusEffect(
         useCallback(() => {
             const fetchCameraData = async () => {
                 try {
                     const response = await fetch(API_URL);
                     const data = await response.json();
-                    
                     setDrones(data.drones); 
                     setAllDroneDetails(data.detail);
                     setLoading(false);
-
                 } catch (error) {
                     console.error("Error fetching camera data:", error);
                     setLoading(false);
                 }
             };
-            
             const interval = setInterval(fetchCameraData, 2000);
             fetchCameraData();
             return () => clearInterval(interval);
@@ -55,7 +60,6 @@ const CameraScreen = ({ navigation }) => {
         const detailData = allDroneDetails.find((d) => d.id === basicDroneData.id);
         const mergedData = detailData ? { ...detailData, ...basicDroneData } : basicDroneData;
         setSelectedDrone(mergedData);
-        
         if (isTablet && sidebarLevel < 2) setSidebarLevel(2);
     };
 
@@ -68,22 +72,7 @@ const CameraScreen = ({ navigation }) => {
         );
     }
 
-    const renderCameraView = () => (
-        <View style={styles.cameraContainer}>
-            <Image
-                source={{ uri: CAMERA_FEED_URL }}
-                style={styles.cameraImage}
-                resizeMode="cover"
-            />
-            
-            <View style={styles.statusOverlay}>
-                <View style={styles.redDot} />
-                <Text style={styles.statusText}>LIVE</Text>
-            </View>
-        </View>
-    );
-
-    // --- Layout for Tablet ---
+    // Tablet
     if (isTablet) {
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: Platform.OS === 'android' ? 30 : 0 }}>
@@ -97,11 +86,7 @@ const CameraScreen = ({ navigation }) => {
                                     <Ionicons name="chevron-back-circle" size={24} color="#999" />
                                 </TouchableOpacity>
                             </View>
-                            <DroneList 
-                                drones={drones} 
-                                selectedDrone={selectedDrone} 
-                                onSelect={handleDroneSelect} 
-                            />
+                            <DroneList drones={drones} selectedDrone={selectedDrone} onSelect={handleDroneSelect} />
                         </View>
                     )}
 
@@ -124,10 +109,18 @@ const CameraScreen = ({ navigation }) => {
                             </TouchableOpacity>
                         )}
                         
-                        {renderCameraView()}
+                        <Image
+                            source={{ uri: `${CAMERA_FEED_URL}?t=${new Date().getTime()}` }} 
+                            style={styles.cameraImage}
+                            resizeMode="cover"
+                        />
+
+                        <View style={styles.statusOverlay}>
+                            <View style={styles.redDot} />
+                            <Text style={styles.statusText}>LIVE</Text>
+                        </View>
                     </View>
                 </View>
-
                 <BottomTab navigation={navigation} />
             </View>
         );
@@ -136,7 +129,6 @@ const CameraScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={{ flex: 1 }}>
-                {renderCameraView()}
                  <TouchableOpacity style={styles.backButtonMobile} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
@@ -155,30 +147,15 @@ const styles = StyleSheet.create({
     columnHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
     headerText: { fontSize: 16, fontWeight: "bold", color: "black" },
     
-    sidebarToggleBtn: {
-        position: 'absolute', top: 20, left: 20, zIndex: 20,
-        backgroundColor: 'white', padding: 10, borderRadius: 8,
-        shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, elevation: 4,
-    },
+    sidebarToggleBtn: { position: 'absolute', top: 20, left: 20, zIndex: 20, backgroundColor: 'white', padding: 10, borderRadius: 8, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, elevation: 4 },
 
-    cameraContainer: { 
-        width: '100%', 
-        height: '100%', 
-        backgroundColor: 'black',
-        justifyContent: 'center', 
-        alignItems: 'center' 
-    },
-    waitText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textTransform: 'lowercase'
-    },
+    cameraImage: { width: '100%', height: '100%' },
 
-    backButtonMobile: {
-        position: 'absolute', top: 40, left: 20,
-        backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 20
-    }
+    statusOverlay: { position: 'absolute', top: 20, right: 20, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
+    redDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'red', marginRight: 6 },
+    statusText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
+
+    backButtonMobile: { position: 'absolute', top: 40, left: 20, backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 20 }
 });
 
 export default CameraScreen;
