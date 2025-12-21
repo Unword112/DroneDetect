@@ -7,10 +7,14 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
-
 const days = ["Sun", "Mon", "Tue", "Wed", "The", "Fri", "Sat"];
 const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
+
+//รอ database ตัวนี้ตัวแปรชั่วคราว
+let userMock = {
+  username: "admin_1",
+  password: 1234,
+}
 
 //รอ database ตัวนี้ตัวแปรชั่วคราว
 let initialMapRegion = {
@@ -176,6 +180,13 @@ app.get('/api/camera-live', (req, res) => {
       if (err) console.error("Error sending camera-live image:", err);
     });
 });
+
+app.get('/api/login', (req, res) => {
+  res.json({
+    username: userMock.username,
+    password: userMock.password,
+  });
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

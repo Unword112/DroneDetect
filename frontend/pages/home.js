@@ -19,6 +19,7 @@ import DroneList from "../components/DroneList";
 import DroneDetail from "../components/DroneDetail";
 import DroneMap from "../components/DroneMap";
 import BottomTab from "../components/BottomTab";
+import ToggleCameraMap from "../components/ToggleCameraMap";
 
 import { setMapRegion } from "./configscreen/locationStore";
 import { addAlert } from "./configscreen/alertStore";
@@ -26,6 +27,7 @@ import { IP_HOST } from "@env";
 
 const API_URL = `http://${IP_HOST}:3000/api/home-data`;
 const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
+const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
 
 const isPointInPolygon = (point, polygon) => {
   const x = point.lat;
@@ -56,17 +58,10 @@ const HomeScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDrone, setSelectedDrone] = useState(null);
   const [allDroneDetails, setAllDroneDetails] = useState([]);
+  const [sidebarLevel, setSidebarLevel] = useState(0);
+  const [viewMode, setViewMode] = useState("map");
+
   const alertedDrones = useRef(new Set());
-  const [sidebarLevel, setSidebarLevel] = useState(2);
-  const [camKey, setCamKey] = useState(Date.now());
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCamKey(Date.now()); 
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -78,7 +73,6 @@ const HomeScreen = ({ navigation }) => {
           const visibleDrones = data.drones.filter((drone) =>
             isPointInPolygon(drone, data.alertZone),
           );
-
           visibleDrones.forEach((drone) => {
             if (isPointInPolygon(drone, data.defenseZone)) {
               if (!alertedDrones.current.has(drone.id)) {
@@ -119,19 +113,10 @@ const HomeScreen = ({ navigation }) => {
     if (isTablet && sidebarLevel < 2) setSidebarLevel(2);
   };
 
-  const getActiveCameraDrone = () => {
-    if (selectedDrone) return selectedDrone;
-
-    if (drones.length > 0) {
-      return drones.reduce((prev, curr) =>
-        prev.distance < curr.distance ? prev : curr,
-      );
-    }
-
-    return null;
+  const handleRegionChange = (region) => {
+    setinitialRegion(region);
+    setMapRegion(region);
   };
-
-  const activeCameraDrone = getActiveCameraDrone();
 
   if (loading) {
     return (
@@ -142,14 +127,14 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  // Teblet
+  // Tablet Layout
   if (isTablet) {
     return (
       <View style={{ flex: 1, backgroundColor: "#fff", paddingTop: Platform.OS === "android" ? 30 : 0 }}>
         <View style={{ flex: 1, flexDirection: "row" }}>
+        
           {sidebarLevel >= 1 && (
             <View style={styles.tabletColList}>
-              {/* Header */}
               <View style={styles.columnHeader}>
                 <Text style={styles.headerText}>Drone Detected</Text>
                 <TouchableOpacity onPress={() => setSidebarLevel(0)}>
@@ -161,28 +146,22 @@ const HomeScreen = ({ navigation }) => {
                 <DroneList drones={drones} selectedDrone={selectedDrone} onSelect={handleDroneSelect} />
               </View>
 
-              {/* ✅ Live Camera Box (แก้ไขให้ใช้ API) */}
               <View style={styles.liveCameraBox}>
                 <View style={styles.liveHeader}>
                   <View style={styles.redDot} />
                   <Text style={styles.liveText}>
-                    {selectedDrone ? "LIVE FEED" : "AUTO TRACKING"}
+                    {selectedDrone ? "TRACKING" : "AUTO TRACKING"}
                   </Text>
                 </View>
 
-                {/* แสดงรูปจาก API เสมอ */}
                 <Image
-                    // ใส่ t=Timestamp เพื่อบังคับให้โหลดรูปใหม่ (ถ้า Server เปลี่ยนรูป)
-                    source={{ uri: `${SIDE_CAMERA_URL}?t=${new Date().getTime()}` }} 
+                    source={{ uri: SIDE_CAMERA_URL }} 
                     style={styles.liveImage}
                     resizeMode="cover"
                 />
-                
                 {selectedDrone && (
                     <View style={styles.cameraLabelOverlay}>
-                      <Text style={styles.cameraLabelText}>
-                        {selectedDrone.name}
-                      </Text>
+                      <Text style={styles.cameraLabelText}>{selectedDrone.name}</Text>
                     </View>
                 )}
               </View>
@@ -202,21 +181,41 @@ const HomeScreen = ({ navigation }) => {
           )}
 
           <View style={{ flex: 5, position: "relative" }}>
+            
             {sidebarLevel === 0 && (
               <TouchableOpacity style={styles.sidebarToggleBtn} onPress={() => setSidebarLevel(2)}>
                 <Ionicons name="list" size={24} color="#007AFF" />
               </TouchableOpacity>
             )}
-            <DroneMap
-              style={{ width: "100%", height: "100%" }}
-              drones={drones}
-              alertZone={alertZone}
-              defenseZone={defenseZone}
-              initialRegion={initialRegion}
-              onRegionChange={setMapRegion}
-              isTablet={true}
-              onCameraPress={() => navigation.navigate("Camera")}
-            />
+
+            <View style={{ position: 'absolute', top: 20, alignSelf: 'center', zIndex: 50 }}>
+                <ToggleCameraMap 
+                    activeMode={viewMode} 
+                    onToggle={setViewMode} 
+                />
+            </View>
+
+            {viewMode === "camera" ? (
+                <View style={{ flex: 1, backgroundColor: 'black', position: 'relative' }}>
+                    <Image
+                        source={{ uri: CAMERA_FEED_URL }}
+                        style={{ width: "100%", height: "100%" }}
+                        resizeMode="cover"
+                    />
+
+                </View>
+            ) : (
+                <DroneMap
+                    style={{ width: "100%", height: "100%" }}
+                    drones={drones}
+                    alertZone={alertZone}
+                    defenseZone={defenseZone}
+                    initialRegion={initialRegion}
+                    onRegionChange={handleRegionChange}
+                    isTablet={true}
+                />
+            )}
+
           </View>
         </View>
         <BottomTab navigation={navigation} />
@@ -224,17 +223,37 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
+  // Mobile Layout
   return (
     <View style={styles.container}>
-      <DroneMap
-        style={[styles.mapMobile, { paddingTop: headerHeight }]}
-        drones={drones}
-        alertZone={alertZone}
-        defenseZone={defenseZone}
-        initialRegion={initialRegion}
-        onRegionChange={setMapRegion}
-        isTablet={false}
-      />
+       <View style={[styles.mapMobile, { paddingTop: 0 }]}>
+         {viewMode === "camera" ? (
+            <View style={{ flex: 1, backgroundColor: 'black' }}>
+                <Image
+                    source={{ uri: CAMERA_FEED_URL }}
+                    style={{ width: "100%", height: "100%" }}
+                    resizeMode="cover"
+                />
+            </View>
+         ) : (
+            <DroneMap
+              style={{ width: "100%", height: "100%" }}
+              drones={drones}
+              alertZone={alertZone}
+              defenseZone={defenseZone}
+              initialRegion={initialRegion}
+              onRegionChange={handleRegionChange}
+              isTablet={false}
+            />
+         )}
+         
+         <View style={{ position: 'absolute', top: headerHeight + 10, alignSelf: 'center', zIndex: 50 }}>
+            <ToggleCameraMap 
+                activeMode={viewMode} 
+                onToggle={setViewMode} 
+            />
+        </View>
+      </View>
 
       <View style={styles.infoContainerMobile}>
         <DroneList
@@ -242,12 +261,12 @@ const HomeScreen = ({ navigation }) => {
           selectedDrone={selectedDrone}
           onSelect={handleDroneSelect}
         />
-
+        
         <TouchableOpacity
           style={styles.cameraButtonMobile}
           onPress={() => navigation.navigate("Camera")}
         >
-          <Text style={styles.cameraButtonText}>Camera</Text>
+          <Text style={styles.cameraButtonText}>Camera (Full Screen)</Text>
         </TouchableOpacity>
       </View>
 
@@ -263,9 +282,7 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.modalHeader}>DRONE DETECTED</Text>
             <Text style={styles.modalTitle}>{selectedDrone?.name}</Text>
             <View style={styles.divider} />
-
             <DroneDetail drone={selectedDrone} />
-
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
@@ -283,135 +300,40 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  columnHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  headerText: { fontSize: 16, fontWeight: "bold", color: "black" }, // เอา marginBottom ออก เพราะจัดการใน columnHeader แล้ว
+  columnHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 15 },
+  headerText: { fontSize: 16, fontWeight: "bold", color: "black" },
+  tabletColList: { flex: 2, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff", justifyContent: "space-between" },
+  tabletColDetail: { flex: 3, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
 
-  // Tablet
-  tabletColList: {
-    flex: 2,
-    padding: 20,
-    borderRightWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
-    justifyContent: "space-between",
-  },
-  tabletColDetail: {
-    flex: 3,
-    padding: 20,
-    borderRightWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
-  },
-  liveCameraBox: {
-    height: 180,
-    backgroundColor: "#000",
-    borderRadius: 12,
-    marginTop: 15,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    position: "relative",
-  },
-  liveImage: {
-    width: "100%",
-    height: "100%",
-  },
-  noSignalBox: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  cameraLabelOverlay: {
-    position: "absolute",
-    bottom: 5,
-    left: 5,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  cameraLabelText: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "bold",
-  },
-
-  sidebarToggleBtn: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 20,
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
-  },
-
-  // Mobile
-  mapMobile: { 
-    width: Dimensions.get("window").width, 
-    height: "70%" 
-  },
-  infoContainerMobile: { 
-    height: "30%", 
-    padding: 15, 
-    backgroundColor: "#fff" 
-  },
-  cameraButtonMobile: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-    marginTop: 10,
-  },
+  liveImage: { width: "100%", height: "100%" },
+  cameraLabelOverlay: { position: "absolute", bottom: 5, left: 5, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  cameraLabelText: { color: "white", fontSize: 10, fontWeight: "bold" },
+  sidebarToggleBtn: { position: "absolute", top: 20, left: 20, zIndex: 20, backgroundColor: "white", padding: 10, borderRadius: 8, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3, elevation: 4 },
+  
+  mapMobile: { width: Dimensions.get("window").width, height: "70%" },
+  infoContainerMobile: { height: "30%", padding: 15, backgroundColor: "#fff" },
+  cameraButtonMobile: { backgroundColor: "#007AFF", padding: 15, borderRadius: 8, alignItems: "center", marginBottom: 10, marginTop: 10 },
   cameraButtonText: { color: "white", fontSize: 16, fontWeight: "bold" },
-
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    minHeight: 400,
-    elevation: 5,
-  },
-  modalIndicator: {
-    width: 40,
-    height: 5,
-    backgroundColor: "#ccc",
-    borderRadius: 3,
-    alignSelf: "center",
-    marginBottom: 15,
-  },
-  modalHeader: {
-    fontSize: 12,
-    color: "#868686",
-    fontWeight: "500",
-    textTransform: "uppercase",
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "black",
-    marginVertical: 5,
-  },
+  
+  modalOverlay: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { backgroundColor: "white", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, minHeight: 400, elevation: 5 },
+  modalIndicator: { width: 40, height: 5, backgroundColor: "#ccc", borderRadius: 3, alignSelf: "center", marginBottom: 15 },
+  modalHeader: { fontSize: 12, color: "#868686", fontWeight: "500", textTransform: "uppercase" },
+  modalTitle: { fontSize: 22, fontWeight: "bold", color: "black", marginVertical: 5 },
   divider: { height: 1, backgroundColor: "#eee", marginVertical: 10 },
   closeButton: { alignItems: "center", padding: 15, marginTop: 10 },
+
+  liveBadge: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5
+  }
 });
 
 export default HomeScreen;

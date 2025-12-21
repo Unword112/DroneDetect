@@ -36,15 +36,6 @@ const DroneMap = ({
 
   return (
     <View style={[styles.container, style]}>
-      {isTablet && (
-        <TouchableOpacity
-          style={styles.floatingCameraBtn}
-          onPress={onCameraPress}
-        >
-          <Text style={styles.cameraButtonText}>Camera</Text>
-        </TouchableOpacity>
-      )}
-
       <MapView
                 style={styles.mapFill}
                 onRegionChangeComplete={onRegionChange}

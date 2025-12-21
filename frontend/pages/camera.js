@@ -25,17 +25,8 @@ const CameraScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [selectedDrone, setSelectedDrone] = useState(null);
     const [allDroneDetails, setAllDroneDetails] = useState([]);
-    
     const [sidebarLevel, setSidebarLevel] = useState(2);
-    const [camKey, setCamKey] = useState(Date.now());
 
-    React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCamKey(Date.now()); // เปลี่ยนค่า camKey เพื่อให้ Image รู้ว่าต้องโหลดใหม่
-    }, 1000); // <-- ปรับเลขนี้ได้ (1000 = 1 วินาที) ถ้าอยากให้ลื่นขึ้นลอง 500 หรือ 200
-
-    return () => clearInterval(interval);
-  }, []);
     useFocusEffect(
         useCallback(() => {
             const fetchCameraData = async () => {
@@ -108,17 +99,13 @@ const CameraScreen = ({ navigation }) => {
                                 <Ionicons name="list" size={24} color="#007AFF" />
                             </TouchableOpacity>
                         )}
-                        
+
                         <Image
-                            source={{ uri: `${CAMERA_FEED_URL}?t=${new Date().getTime()}` }} 
+                            source={{ uri: CAMERA_FEED_URL }} 
                             style={styles.cameraImage}
                             resizeMode="cover"
                         />
 
-                        <View style={styles.statusOverlay}>
-                            <View style={styles.redDot} />
-                            <Text style={styles.statusText}>LIVE</Text>
-                        </View>
                     </View>
                 </View>
                 <BottomTab navigation={navigation} />
@@ -129,6 +116,12 @@ const CameraScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={{ flex: 1 }}>
+                <Image
+                    source={{ uri: CAMERA_FEED_URL }} 
+                    style={styles.cameraImage}
+                    resizeMode="cover"
+                />
+
                  <TouchableOpacity style={styles.backButtonMobile} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
@@ -141,8 +134,8 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#000" },
     loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
     
-    tabletColList: { flex: 2, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
-    tabletColDetail: { flex: 3, padding: 20, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
+    tabletColList: { flex: 2, padding: 20, top: 45, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
+    tabletColDetail: { flex: 3, padding: 20, top: 45, borderRightWidth: 1, borderColor: "#eee", backgroundColor: "#fff" },
     
     columnHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
     headerText: { fontSize: 16, fontWeight: "bold", color: "black" },
@@ -150,10 +143,6 @@ const styles = StyleSheet.create({
     sidebarToggleBtn: { position: 'absolute', top: 20, left: 20, zIndex: 20, backgroundColor: 'white', padding: 10, borderRadius: 8, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, elevation: 4 },
 
     cameraImage: { width: '100%', height: '100%' },
-
-    statusOverlay: { position: 'absolute', top: 20, right: 20, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
-    redDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'red', marginRight: 6 },
-    statusText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
 
     backButtonMobile: { position: 'absolute', top: 40, left: 20, backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 20 }
 });
