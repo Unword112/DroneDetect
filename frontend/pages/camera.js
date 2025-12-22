@@ -143,12 +143,6 @@ const CameraScreen = ({ navigation }) => {
           resizeMode="cover"
         />
 
-        <TouchableOpacity
-          style={styles.backButtonMobile}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -199,14 +193,6 @@ const styles = StyleSheet.create({
 
   cameraImage: { width: "100%", height: "100%" },
 
-  backButtonMobile: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: 10,
-    borderRadius: 20,
-  },
 });
 
 export default CameraScreen;
