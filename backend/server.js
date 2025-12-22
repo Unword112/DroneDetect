@@ -10,13 +10,15 @@ app.use(express.json());
 const days = ["Sun", "Mon", "Tue", "Wed", "The", "Fri", "Sat"];
 const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
+// ✅ แก้ไข: เปลี่ยน URL ให้ชี้ไปที่ API get-image (IP Emulator)
 let userMock = {
-  username: "admin_1",
+  user_id: 1,
+  name: "Pol.Sen.Sgt.Maj. Jidee",
+  username: "admin",
   password: 1234,
+  imageUrl: 'http://10.0.2.2:3000/api/get-image/userimage.jpg'
 }
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
 let initialMapRegion = {
   latitude: 13.785,
   longitude: 100.55,
@@ -24,7 +26,6 @@ let initialMapRegion = {
   longitudeDelta: 0.007,
 };
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
 let mockDroneDetail = [
   {
     id: 14,
@@ -48,7 +49,6 @@ let mockDroneDetail = [
   },
 ];
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
 let mockDroneData = [
   {
     id: mockDroneDetail[0].id,
@@ -56,7 +56,7 @@ let mockDroneData = [
     distance: mockDroneDetail[0].distance,
     lat: 13.7845,
     lon: 100.551,
-    imageUrl: 'http://10.0.2.2:3000/images/drone_1.jpg'
+    imageUrl: 'drone_1.jpg'
   },
   {
     id: mockDroneDetail[1].id,
@@ -64,11 +64,10 @@ let mockDroneData = [
     distance: mockDroneDetail[1].distance,
     lat: 13.788,
     lon: 100.548,
-    imageUrl: 'http://10.0.2.2:3000/images/drone_2.jpg'
+    imageUrl: 'drone_2.jpg'
   },
 ];
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
 let defenseBoundaryCoords = [
   { latitude: 13.785, longitude: 100.548 },
   { latitude: 13.787, longitude: 100.551 },
@@ -77,7 +76,6 @@ let defenseBoundaryCoords = [
   { latitude: 13.785, longitude: 100.548 },
 ];
 
-//รอ database ตัวนี้ตัวแปรชั่วคราว
 let alertZoneCoords = [
   { latitude: 13.79, longitude: 100.556 },
   { latitude: 13.792, longitude: 100.545 },
@@ -108,7 +106,6 @@ let droneHistoryLogs = mockDroneData.map((drone) => ({
 }));
 
 //Endpoints
-//drone data
 app.get("/api/home-data", (req, res) => {
   res.json({
     drones: mockDroneData,
@@ -119,7 +116,6 @@ app.get("/api/home-data", (req, res) => {
   });
 });
 
-//edit zone screen
 app.post("/api/update-zones", (req, res) => {
   const { defenseZone, alertZone } = req.body;
 
@@ -130,7 +126,6 @@ app.post("/api/update-zones", (req, res) => {
   res.json({ success: true, message: "Zones updated successfully" });
 });
 
-//report screen
 app.get("/api/report-data", (req, res) => {
   const drones = mockDroneDetail;
   const totalDetected = drones.length;
@@ -167,15 +162,24 @@ app.get("/api/report-data", (req, res) => {
 
 app.get('/api/side-camera', (req, res) => {
   const imagePath = path.join(__dirname, 'images', 'drone_1.jpg');
-  
   res.sendFile(imagePath, (err) => {
       if (err) console.error("Error sending side-camera image:", err);
   });
 });
 
+app.get('/api/get-image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'images', filename);
+  res.sendFile(imagePath, (err) => {
+      if (err) {
+        console.error("Image not found:", filename);
+        res.status(404).send("Image not found");
+      }
+  });
+});
+
 app.get('/api/camera-live', (req, res) => {
     const imagePath = path.join(__dirname, 'images', 'camera_1.jpg');
-    
     res.sendFile(imagePath, (err) => {
       if (err) console.error("Error sending camera-live image:", err);
     });
@@ -183,8 +187,11 @@ app.get('/api/camera-live', (req, res) => {
 
 app.get('/api/login', (req, res) => {
   res.json({
+    userid: userMock.user_id,
+    name: userMock.name,
     username: userMock.username,
     password: userMock.password,
+    imagePath: userMock.imageUrl,
   });
 })
 

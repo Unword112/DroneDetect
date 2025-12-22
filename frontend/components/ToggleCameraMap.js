@@ -5,19 +5,35 @@ const ToggleCameraMap = ({ activeMode, onToggle }) => {
   return (
     <View style={styles.toggleContainer}>
       <TouchableOpacity
-        style={[styles.toggleBtn, activeMode === "map" && styles.toggleBtnActive]}
+        style={[
+          styles.toggleBtn,
+          activeMode === "map" && styles.toggleBtnActive,
+        ]}
         onPress={() => onToggle("map")}
       >
-        <Text style={[styles.toggleText, activeMode === "map" && styles.toggleTextActive]}>
+        <Text
+          style={[
+            styles.toggleText,
+            activeMode === "map" && styles.toggleTextActive,
+          ]}
+        >
           Map View
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.toggleBtn, activeMode === "camera" && styles.toggleBtnActive]}
+        style={[
+          styles.toggleBtn,
+          activeMode === "camera" && styles.toggleBtnActive,
+        ]}
         onPress={() => onToggle("camera")}
       >
-        <Text style={[styles.toggleText, activeMode === "camera" && styles.toggleTextActive]}>
+        <Text
+          style={[
+            styles.toggleText,
+            activeMode === "camera" && styles.toggleTextActive,
+          ]}
+        >
           Live Feed
         </Text>
       </TouchableOpacity>

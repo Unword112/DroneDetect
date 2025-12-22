@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
-import MapView, { Polygon, Marker, Polyline } from 'react-native-maps';
+import MapView, { Polygon, Marker, Polyline } from "react-native-maps";
 
 const DroneMap = ({
   drones,
@@ -12,53 +12,61 @@ const DroneMap = ({
   onCameraPress,
   style,
 }) => {
+  const defenseCenter = useMemo(() => {
+    if (!defenseZone || defenseZone.length === 0) return null;
 
-    const defenseCenter = useMemo(() => {
-        if (!defenseZone || defenseZone.length === 0) return null;
-        
-        let minLat = defenseZone[0].latitude;
-        let maxLat = defenseZone[0].latitude;
-        let minLon = defenseZone[0].longitude;
-        let maxLon = defenseZone[0].longitude;
+    let minLat = defenseZone[0].latitude;
+    let maxLat = defenseZone[0].latitude;
+    let minLon = defenseZone[0].longitude;
+    let maxLon = defenseZone[0].longitude;
 
-        defenseZone.forEach(point => {
-            if (point.latitude < minLat) minLat = point.latitude;
-            if (point.latitude > maxLat) maxLat = point.latitude;
-            if (point.longitude < minLon) minLon = point.longitude;
-            if (point.longitude > maxLon) maxLon = point.longitude;
-        });
+    defenseZone.forEach((point) => {
+      if (point.latitude < minLat) minLat = point.latitude;
+      if (point.latitude > maxLat) maxLat = point.latitude;
+      if (point.longitude < minLon) minLon = point.longitude;
+      if (point.longitude > maxLon) maxLon = point.longitude;
+    });
 
-        return {
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        };
-    }, [defenseZone]);
+    return {
+      latitude: (minLat + maxLat) / 2,
+      longitude: (minLon + maxLon) / 2,
+    };
+  }, [defenseZone]);
 
   return (
     <View style={[styles.container, style]}>
       <MapView
-                style={styles.mapFill}
-                onRegionChangeComplete={onRegionChange}
-                initialRegion={initialRegion}
-            >
-                {alertZone.length > 0 && (
-                    <Polygon coordinates={alertZone} strokeColor="rgba(0,0,0,0.5)" strokeWidth={1} fillColor="rgba(0,180,255,0.3)" />
-                )}
-                {defenseZone.length > 0 && (
-                    <Polygon coordinates={defenseZone} strokeColor="rgba(0,0,0,0.5)" strokeWidth={1} fillColor="rgba(255,69,0,0.4)" />
-                )}
+        style={styles.mapFill}
+        onRegionChangeComplete={onRegionChange}
+        initialRegion={initialRegion}
+      >
+        {alertZone.length > 0 && (
+          <Polygon
+            coordinates={alertZone}
+            strokeColor="rgba(0,0,0,0.5)"
+            strokeWidth={1}
+            fillColor="rgba(0,180,255,0.3)"
+          />
+        )}
+        {defenseZone.length > 0 && (
+          <Polygon
+            coordinates={defenseZone}
+            strokeColor="rgba(0,0,0,0.5)"
+            strokeWidth={1}
+            fillColor="rgba(255,69,0,0.4)"
+          />
+        )}
 
-                {drones.map((drone) => (
-                    <Marker
-                        key={drone.id}
-                        coordinate={{ latitude: drone.lat, longitude: drone.lon }}
-                        title={drone.name}
-                    >
-                        <View style={styles.droneMarker} />
-                    </Marker>
-                ))}
-
-            </MapView>
+        {drones.map((drone) => (
+          <Marker
+            key={drone.id}
+            coordinate={{ latitude: drone.lat, longitude: drone.lon }}
+            title={drone.name}
+          >
+            <View style={styles.droneMarker} />
+          </Marker>
+        ))}
+      </MapView>
     </View>
   );
 };
@@ -76,7 +84,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
-    elevation: 5
+    elevation: 5,
   },
   floatingCameraBtn: {
     position: "absolute",

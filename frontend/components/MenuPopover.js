@@ -32,7 +32,6 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={styles.popoverContainer}>
-            
             {/* 3. ใช้ .map() วนลูปสร้างเมนูแทนการเขียนซ้ำๆ */}
             {menuItems.map((item, index) => {
               // เช็คว่าเป็นตัวสุดท้ายไหม (เพื่อเอาเส้นขีดด้านล่างออก)
@@ -60,7 +59,6 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
                 </TouchableOpacity>
               );
             })}
-
           </View>
         </View>
       </TouchableWithoutFeedback>

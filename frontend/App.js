@@ -21,6 +21,9 @@ import HomeScreen from "./pages/home";
 import CameraScreen from "./pages/camera";
 import EditZoneScreen from "./pages/configscreen/editZone";
 
+import LoginScreen from "./pages/login";
+import RegisterScreen from "./pages/register";
+
 import MenuPopover from "./components/MenuPopover";
 
 function MenuButton() {
@@ -82,7 +85,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="Login"
         screenOptions={{
           headerTransparent: true,
           headerTintColor: "#000000ff",
@@ -90,6 +93,21 @@ export default function App() {
           headerRight: () => <MenuButton />,
         }}
       >
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: false }} // ซ่อน Header เพราะเราทำปุ่ม Back เองแล้ว
+        />
+
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -116,7 +134,6 @@ export default function App() {
           component={AccountScreen}
           options={{ title: "" }}
         />
-
         <Stack.Screen
           name="Camera"
           component={CameraScreen}

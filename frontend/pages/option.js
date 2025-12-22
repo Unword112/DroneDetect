@@ -1,10 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { IP_HOST } from "@env";
 
 const OptionScreen = ({ navigation }) => {
-
   const [isSoundOn, setSoundOn] = useState(true);
   const [isVibrationOn, setVibrationOn] = useState(true);
   const [showDefenseZone, setShowDefenseZone] = useState(true);
@@ -13,11 +20,21 @@ const OptionScreen = ({ navigation }) => {
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", style: "destructive", onPress: () => navigation.navigate("Home") } // หรือไปหน้า Login
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => navigation.navigate("Home"),
+      },
     ]);
   };
 
-  const SettingItem = ({ icon, label, value, onValueChange, type = "switch" }) => (
+  const SettingItem = ({
+    icon,
+    label,
+    value,
+    onValueChange,
+    type = "switch",
+  }) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemLeft}>
         <View style={styles.iconBox}>
@@ -25,7 +42,7 @@ const OptionScreen = ({ navigation }) => {
         </View>
         <Text style={styles.itemText}>{label}</Text>
       </View>
-      
+
       {type === "switch" ? (
         <Switch
           trackColor={{ false: "#767577", true: "#34C759" }}
@@ -34,9 +51,11 @@ const OptionScreen = ({ navigation }) => {
           value={value}
         />
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.valueText}>{value}</Text>
-            {type === 'link' && <Ionicons name="chevron-forward" size={20} color="#ccc" />}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.valueText}>{value}</Text>
+          {type === "link" && (
+            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+          )}
         </View>
       )}
     </View>
@@ -45,70 +64,63 @@ const OptionScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        
         <Text style={styles.headerTitle}>Settings</Text>
 
         <Text style={styles.sectionHeader}>NOTIFICATIONS</Text>
         <View style={styles.sectionBlock}>
-          <SettingItem 
-            icon="notifications" 
-            label="Sound Alert" 
-            value={isSoundOn} 
-            onValueChange={setSoundOn} 
+          <SettingItem
+            icon="notifications"
+            label="Sound Alert"
+            value={isSoundOn}
+            onValueChange={setSoundOn}
           />
           <View style={styles.divider} />
-          <SettingItem 
-            icon="phone-portrait" 
-            label="Vibration" 
-            value={isVibrationOn} 
-            onValueChange={setVibrationOn} 
+          <SettingItem
+            icon="phone-portrait"
+            label="Vibration"
+            value={isVibrationOn}
+            onValueChange={setVibrationOn}
           />
         </View>
 
         <Text style={styles.sectionHeader}>MAP DISPLAY</Text>
         <View style={styles.sectionBlock}>
-          <SettingItem 
-            icon="shield" 
-            label="Show Defense Zone" 
-            value={showDefenseZone} 
-            onValueChange={setShowDefenseZone} 
+          <SettingItem
+            icon="shield"
+            label="Show Defense Zone"
+            value={showDefenseZone}
+            onValueChange={setShowDefenseZone}
           />
           <View style={styles.divider} />
-          <SettingItem 
-            icon="alert-circle" 
-            label="Show Alert Zone" 
-            value={showAlertZone} 
-            onValueChange={setShowAlertZone} 
+          <SettingItem
+            icon="alert-circle"
+            label="Show Alert Zone"
+            value={showAlertZone}
+            onValueChange={setShowAlertZone}
           />
         </View>
 
         <Text style={styles.sectionHeader}>CONNECTION</Text>
         <View style={styles.sectionBlock}>
-          <SettingItem 
-            icon="server" 
-            label="Server IP" 
-            value={IP_HOST || "Not Set"} 
+          <SettingItem
+            icon="server"
+            label="Server IP"
+            value={IP_HOST || "Not Set"}
             type="info"
           />
           <View style={styles.divider} />
-          <SettingItem 
-            icon="pulse" 
-            label="Status" 
-            value="Connected" 
+          <SettingItem
+            icon="pulse"
+            label="Status"
+            value="Connected"
             type="info"
           />
         </View>
 
-        {/* Section 4: Account */}
         <Text style={styles.sectionHeader}>ACCOUNT</Text>
-        <View style={styles.sectionBlock}>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-             <Text style={styles.logoutText}>Log Out</Text>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.sectionBlock}></View>
 
         <Text style={styles.versionText}>Drone Detector App v1.0.0</Text>
-
       </ScrollView>
     </View>
   );
@@ -179,19 +191,19 @@ const styles = StyleSheet.create({
   },
   logoutBtn: {
     paddingVertical: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoutText: {
-    color: '#FF3B30',
+    color: "#FF3B30",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   versionText: {
-    textAlign: 'center',
-    color: '#999',
+    textAlign: "center",
+    color: "#999",
     marginTop: 30,
     fontSize: 12,
-  }
+  },
 });
 
 export default OptionScreen;
