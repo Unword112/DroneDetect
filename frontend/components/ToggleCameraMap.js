@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const ToggleCameraMap = ({ activeMode, onToggle }) => {
+  const lastPressTime = useRef(0);
+  const DELAY_MS = 500;
+
+  const handlePress = (mode) => {
+    const now = Date.now();
+
+    if (now - lastPressTime.current < DELAY_MS) {
+      return;
+    }
+
+    lastPressTime.current = now;
+    onToggle(mode);
+  };
+
   return (
     <View style={styles.toggleContainer}>
       <TouchableOpacity
@@ -9,7 +23,8 @@ const ToggleCameraMap = ({ activeMode, onToggle }) => {
           styles.toggleBtn,
           activeMode === "map" && styles.toggleBtnActive,
         ]}
-        onPress={() => onToggle("map")}
+        onPress={() => handlePress("map")}
+        activeOpacity={0.7}
       >
         <Text
           style={[
@@ -26,7 +41,8 @@ const ToggleCameraMap = ({ activeMode, onToggle }) => {
           styles.toggleBtn,
           activeMode === "camera" && styles.toggleBtnActive,
         ]}
-        onPress={() => onToggle("camera")}
+        onPress={() => handlePress("camera")}
+        activeOpacity={0.7}
       >
         <Text
           style={[
@@ -34,7 +50,7 @@ const ToggleCameraMap = ({ activeMode, onToggle }) => {
             activeMode === "camera" && styles.toggleTextActive,
           ]}
         >
-          Live Feed
+          Camera
         </Text>
       </TouchableOpacity>
     </View>

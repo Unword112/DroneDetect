@@ -19,6 +19,7 @@ const DroneList = ({ drones, selectedDrone, onSelect }) => {
               key={drone.id}
               onPress={() => onSelect(drone)}
               style={styles.itemWrapper}
+              activeOpacity={0.7}
             >
               <View
                 style={[styles.listItem, isSelected && styles.selectedItem]}
@@ -55,14 +56,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   selectedItem: { backgroundColor: "#F0F8FF" },
   targetText: { fontSize: 16, fontWeight: "600", flex: 1, color: "#333" },
   indicator: { width: 12, height: 12, borderRadius: 6 },
-  subText: { fontSize: 12, color: "#868686", marginTop: 2, paddingLeft: 5 },
+  subText: { fontSize: 12, color: "#868686", marginTop: 2, paddingLeft: 12 },
 });
 
 export default DroneList;

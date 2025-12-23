@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 
-import { subscribe, getUnreadCount } from "../pages/configscreen/alertStore";
+import { subscribe, getUnreadCount } from "../../pages/configscreen/alertStore";
 
 const BottomTab = ({ navigation }) => {
   const route = useRoute();

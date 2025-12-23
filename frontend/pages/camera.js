@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import DroneList from "../components/DroneList";
 import DroneDetail from "../components/DroneDetail";
-import BottomTab from "../components/BottomTab";
+import BottomTab from "../components/tablet/BottomTab";
 
 import { IP_HOST } from "@env";
 
@@ -142,7 +142,6 @@ const CameraScreen = ({ navigation }) => {
           style={styles.cameraImage}
           resizeMode="cover"
         />
-
       </View>
     </View>
   );
@@ -192,7 +191,6 @@ const styles = StyleSheet.create({
   },
 
   cameraImage: { width: "100%", height: "100%" },
-
 });
 
 export default CameraScreen;

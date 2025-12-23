@@ -6,7 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
-} from "react-native"; // เพิ่ม Alert
+} from "react-native"; 
 import MapView, { Polygon, Marker } from "react-native-maps";
 import { currentMapRegion } from "./locationStore";
 
@@ -46,7 +46,6 @@ const EditZoneScreen = ({ navigation }) => {
     }
   };
 
-  // 1. ฟังก์ชันบันทึกข้อมูล
   const handleSave = async () => {
     try {
       const response = await fetch(API_URL, {

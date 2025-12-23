@@ -10,20 +10,19 @@ app.use(express.json());
 const days = ["Sun", "Mon", "Tue", "Wed", "The", "Fri", "Sat"];
 const weeklyCounts = [0, 0, 0, 0, 0, 0, 0];
 
-// ✅ แก้ไข: เปลี่ยน URL ให้ชี้ไปที่ API get-image (IP Emulator)
 let userMock = {
   user_id: 1,
   name: "Pol.Sen.Sgt.Maj. Jidee",
   username: "admin",
   password: 1234,
-  imageUrl: 'http://10.0.2.2:3000/api/get-image/userimage.jpg'
-}
+  imageUrl: "http://10.0.2.2:3000/api/get-image/userimage.jpg",
+};
 
 let initialMapRegion = {
   latitude: 13.785,
   longitude: 100.55,
-  latitudeDelta: 0.007,
-  longitudeDelta: 0.007,
+  latitudeDelta: 0.01,
+  longitudeDelta: 0.01,
 };
 
 let mockDroneDetail = [
@@ -56,7 +55,7 @@ let mockDroneData = [
     distance: mockDroneDetail[0].distance,
     lat: 13.7845,
     lon: 100.551,
-    imageUrl: 'drone_1.jpg'
+    imageUrl: "drone_1.jpg",
   },
   {
     id: mockDroneDetail[1].id,
@@ -64,7 +63,7 @@ let mockDroneData = [
     distance: mockDroneDetail[1].distance,
     lat: 13.788,
     lon: 100.548,
-    imageUrl: 'drone_2.jpg'
+    imageUrl: "drone_2.jpg",
   },
 ];
 
@@ -160,32 +159,32 @@ app.get("/api/report-data", (req, res) => {
   });
 });
 
-app.get('/api/side-camera', (req, res) => {
-  const imagePath = path.join(__dirname, 'images', 'drone_1.jpg');
+app.get("/api/side-camera", (req, res) => {
+  const imagePath = path.join(__dirname, "images", "drone_1.jpg");
   res.sendFile(imagePath, (err) => {
-      if (err) console.error("Error sending side-camera image:", err);
+    if (err) console.error("Error sending side-camera image:", err);
   });
 });
 
-app.get('/api/get-image/:filename', (req, res) => {
+app.get("/api/get-image/:filename", (req, res) => {
   const filename = req.params.filename;
-  const imagePath = path.join(__dirname, 'images', filename);
+  const imagePath = path.join(__dirname, "images", filename);
   res.sendFile(imagePath, (err) => {
-      if (err) {
-        console.error("Image not found:", filename);
-        res.status(404).send("Image not found");
-      }
+    if (err) {
+      console.error("Image not found:", filename);
+      res.status(404).send("Image not found");
+    }
   });
 });
 
-app.get('/api/camera-live', (req, res) => {
-    const imagePath = path.join(__dirname, 'images', 'camera_1.jpg');
-    res.sendFile(imagePath, (err) => {
-      if (err) console.error("Error sending camera-live image:", err);
-    });
+app.get("/api/camera-live", (req, res) => {
+  const imagePath = path.join(__dirname, "images", "camera_1.jpg");
+  res.sendFile(imagePath, (err) => {
+    if (err) console.error("Error sending camera-live image:", err);
+  });
 });
 
-app.get('/api/login', (req, res) => {
+app.get("/api/login", (req, res) => {
   res.json({
     userid: userMock.user_id,
     name: userMock.name,
@@ -193,7 +192,7 @@ app.get('/api/login', (req, res) => {
     password: userMock.password,
     imagePath: userMock.imageUrl,
   });
-})
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

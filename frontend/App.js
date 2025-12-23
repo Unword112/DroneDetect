@@ -24,7 +24,7 @@ import EditZoneScreen from "./pages/configscreen/editZone";
 import LoginScreen from "./pages/login";
 import RegisterScreen from "./pages/register";
 
-import MenuPopover from "./components/MenuPopover";
+import MenuPopover from "./components/mobile/MenuPopover";
 
 function MenuButton() {
   const [isMenuVisible, setMenuVisible] = React.useState(false);

@@ -32,9 +32,7 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={styles.popoverContainer}>
-            {/* 3. ใช้ .map() วนลูปสร้างเมนูแทนการเขียนซ้ำๆ */}
             {menuItems.map((item, index) => {
-              // เช็คว่าเป็นตัวสุดท้ายไหม (เพื่อเอาเส้นขีดด้านล่างออก)
               const isLastItem = index === menuItems.length - 1;
 
               return (
@@ -42,14 +40,13 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
                   key={item.name}
                   style={[
                     styles.menuItem,
-                    isLastItem && { borderBottomWidth: 0 }, // ถ้าตัวสุดท้ายไม่ต้องมีเส้น
+                    isLastItem && { borderBottomWidth: 0 },
                   ]}
                   onPress={() => handlePress(item.name)}
                 >
                   <View style={styles.rowBetween}>
                     <Text style={styles.menuText}>{item.label}</Text>
 
-                    {/* แสดง Badge แจ้งเตือนเฉพาะเมนู Alert */}
                     {item.name === "Alert" && alertCount > 0 && (
                       <View style={styles.alertBadge}>
                         <Text style={styles.alertBadgeText}>{alertCount}</Text>
