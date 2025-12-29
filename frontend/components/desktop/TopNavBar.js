@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/ThemeContext";
 
 import { subscribe, getUnreadCount } from "../../pages/configscreen/alertStore"; 
 
 const TopNavBar = () => {
   const navigation = useNavigation();
   const route = useRoute();
+
+  const { theme } = useTheme();
+  const colors = theme.colors;
   
   const [unreadCount, setUnreadCount] = useState(getUnreadCount());
 
@@ -26,11 +30,15 @@ const TopNavBar = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+      <View>
+        <Text style={{ fontSize: 16, color: "blue", paddingRight: 700}}>LOGO</Text>  
+      </View>
+      
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => {
           const isActive = route.name === item.route;
-          const activeColor = isActive ? "black" : "#999"; 
+          const activeColor = isActive ? colors.primary : colors.subText;
 
           return (
             <TouchableOpacity
@@ -67,9 +75,7 @@ const styles = StyleSheet.create({
   container: {
     height: 100,
     paddingTop: 50,
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",

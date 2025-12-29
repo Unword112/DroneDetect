@@ -9,6 +9,8 @@ import ToggleCameraMap from "../ToggleCameraMap";
 import TopNavBar from "./TopNavBar";
 import { IP_HOST } from "@env";
 
+import { useTheme } from "../../context/ThemeContext";
+
 const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
 
@@ -24,14 +26,17 @@ const DesktopHome = ({
   initialRegion,
   handleRegionChange,
 }) => {
+  const { theme } = useTheme();
+  const colors = theme.colors;
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <TopNavBar />
 
       <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={styles.colList}>
+        <View style={[styles.colList, { borderColor: colors.border }]}>
           <View style={styles.columnHeader}>
-            <Text style={styles.headerText}>Drone Detected</Text>
+            <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
           </View>
           <View style={{ flex: 1 }}>
             <DroneList
@@ -59,9 +64,9 @@ const DesktopHome = ({
           </View>
         </View>
 
-        <View style={styles.colDetail}>
+        <View style={[styles.colDetail, { borderColor: colors.border }]}>
           <View style={styles.columnHeader}>
-            <Text style={styles.headerText}>Detail</Text>
+            <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
           </View>
           <DroneDetail drone={selectedDrone} />
         </View>
@@ -97,8 +102,8 @@ const DesktopHome = ({
 };
 
 const styles = StyleSheet.create({
-  colList: { flex: 2, padding: 20, borderRightWidth: 1, borderColor: "#eee" },
-  colDetail: { flex: 3, padding: 20, borderRightWidth: 1, borderColor: "#eee" },
+  colList: { flex: 2, padding: 20, borderRightWidth: 1 }, 
+  colDetail: { flex: 3, padding: 20, borderRightWidth: 1 },
   columnHeader: { marginBottom: 15 },
   headerText: { fontSize: 16, fontWeight: "bold" },
   liveCameraBox: {

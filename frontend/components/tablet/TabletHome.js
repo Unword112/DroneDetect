@@ -16,6 +16,8 @@ import ToggleCameraMap from "../ToggleCameraMap";
 import BottomTab from "../tablet/BottomTab";
 import { IP_HOST } from "@env";
 
+import { useTheme } from "../../context/ThemeContext";
+
 const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
 
@@ -34,21 +36,24 @@ const TabletHome = ({
   sidebarLevel,
   setSidebarLevel,
 }) => {
+  const { theme } = useTheme();
+  const colors = theme.colors;
+
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: colors.background,
         paddingTop: Platform.OS === "android" ? 30 : 0,
       }}
     >
       <View style={{ flex: 1, flexDirection: "row" }}>
         {sidebarLevel >= 1 && (
-          <View style={styles.colList}>
+          <View style={[styles.colList, { borderColor: colors.border }]}> 
             <View style={styles.columnHeader}>
-              <Text style={styles.headerText}>Drone Detected</Text>
+              <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
               <TouchableOpacity onPress={() => setSidebarLevel(0)}>
-                <Ionicons name="chevron-back-circle" size={24} color="#999" />
+                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1 }}>
@@ -79,11 +84,11 @@ const TabletHome = ({
         )}
 
         {sidebarLevel >= 2 && (
-          <View style={styles.colDetail}>
+          <View style={[styles.colDetail, { borderColor: colors.border }]}> 
             <View style={styles.columnHeader}>
-              <Text style={styles.headerText}>Detail</Text>
+              <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
               <TouchableOpacity onPress={() => setSidebarLevel(1)}>
-                <Ionicons name="chevron-back-circle" size={24} color="#999" />
+                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
               </TouchableOpacity>
             </View>
             <DroneDetail drone={selectedDrone} />
@@ -93,7 +98,7 @@ const TabletHome = ({
         <View style={{ flex: 5, position: "relative" }}>
           {sidebarLevel === 0 && (
             <TouchableOpacity
-              style={styles.sidebarToggleBtn}
+              style={[styles.sidebarToggleBtn, { backgroundColor: colors.surface }]}
               onPress={() => setSidebarLevel(2)}
             >
               <Ionicons name="list" size={24} color="#007AFF" />
@@ -131,8 +136,8 @@ const TabletHome = ({
 };
 
 const styles = StyleSheet.create({
-  colList: { flex: 2, padding: 20, borderRightWidth: 1, borderColor: "#eee" },
-  colDetail: { flex: 3, padding: 20, borderRightWidth: 1, borderColor: "#eee" },
+  colList: { flex: 2, padding: 20, borderRightWidth: 1 },
+  colDetail: { flex: 3, padding: 20, borderRightWidth: 1 },
   columnHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -160,10 +165,12 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     zIndex: 20,
-    backgroundColor: "white",
     padding: 10,
     borderRadius: 8,
     elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
   },
   liveHeader: {
     position: "absolute",

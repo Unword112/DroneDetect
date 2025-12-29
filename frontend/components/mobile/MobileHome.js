@@ -133,14 +133,14 @@ const MobileHome = ({
               styles.modalContent,
               { 
                 transform: [{ translateY: slideAnim }],
-                backgroundColor: colors.surface // เปลี่ยนสีพื้นหลัง Modal
+                backgroundColor: colors.surface 
               },
             ]}
           >
             <View style={[styles.modalIndicator, { backgroundColor: colors.border }]} />
             
             <Text style={[styles.modalHeader, { color: colors.subText }]}>DRONE DETECTED</Text>
-            
+    
             <Text style={[styles.modalTitle, { color: colors.text }]}>{selectedDrone?.name}</Text>
             
             <View style={[styles.divider, { backgroundColor: colors.border }]} />

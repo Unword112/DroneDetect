@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Switch,
-  TouchableOpacity,
   ScrollView,
   Alert,
 } from "react-native";
@@ -44,11 +43,11 @@ const OptionScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#000' : '#F2F2F7' }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
 
-        <Text style={styles.sectionHeader}>APPEARANCE</Text>
+        <Text style={[styles.sectionHeader, { color: colors.subText }]}>APPEARANCE</Text>
         <View style={[styles.sectionBlock, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="moon"
@@ -58,15 +57,15 @@ const OptionScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.sectionHeader}>NOTIFICATIONS</Text>
-        <View style={styles.sectionBlock}>
+        <Text style={[styles.sectionHeader, { color: colors.subText }]}>NOTIFICATIONS</Text>
+        <View style={[styles.sectionBlock, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="notifications"
             label="Sound Alert"
             value={isSoundOn}
             onValueChange={setSoundOn}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <SettingItem
             icon="phone-portrait"
             label="Vibration"
@@ -75,15 +74,15 @@ const OptionScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.sectionHeader}>MAP DISPLAY</Text>
-        <View style={styles.sectionBlock}>
+        <Text style={[styles.sectionHeader, { color: colors.subText }]}>MAP DISPLAY</Text>
+        <View style={[styles.sectionBlock, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="shield"
             label="Show Defense Zone"
             value={showDefenseZone}
             onValueChange={setShowDefenseZone}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <SettingItem
             icon="alert-circle"
             label="Show Alert Zone"
@@ -92,15 +91,15 @@ const OptionScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.sectionHeader}>CONNECTION</Text>
-        <View style={styles.sectionBlock}>
+        <Text style={[styles.sectionHeader, { color: colors.subText }]}>CONNECTION</Text>
+        <View style={[styles.sectionBlock, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="server"
             label="Server IP"
             value={IP_HOST || "Not Set"}
             type="info"
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <SettingItem
             icon="pulse"
             label="Status"
@@ -109,10 +108,7 @@ const OptionScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.sectionHeader}>ACCOUNT</Text>
-        <View style={styles.sectionBlock}></View>
-
-        <Text style={styles.versionText}>Drone Detector App v1.0.0</Text>
+        <Text style={[styles.versionText, { color: colors.subText }]}>Drone Detector App v1.0.0</Text>
       </ScrollView>
     </View>
   );
@@ -121,29 +117,26 @@ const OptionScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2F2F7",
   },
   scrollContent: {
     top: 25,
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 50,
   },
   headerTitle: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#000",
   },
   sectionHeader: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#6e6e6e",
     marginBottom: 8,
     marginTop: 15,
     marginLeft: 10,
   },
   sectionBlock: {
-    backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
   },
@@ -162,7 +155,6 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 6,
-    backgroundColor: "#E5F1FF",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -172,26 +164,14 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontSize: 16,
-    color: "#8e8e93",
     marginRight: 5,
   },
   divider: {
     height: 1,
-    backgroundColor: "#f0f0f0",
     marginLeft: 50,
-  },
-  logoutBtn: {
-    paddingVertical: 15,
-    alignItems: "center",
-  },
-  logoutText: {
-    color: "#FF3B30",
-    fontSize: 16,
-    fontWeight: "600",
   },
   versionText: {
     textAlign: "center",
-    color: "#999",
     marginTop: 30,
     fontSize: 12,
   },
