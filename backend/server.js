@@ -106,8 +106,17 @@ let droneHistoryLogs = mockDroneData.map((drone) => ({
 
 //Endpoints
 app.get("/api/home-data", (req, res) => {
+  const visibleDrones = mockDroneData.filter((drone) =>
+    isPointInPolygon(drone.lat, drone.lon, alertZoneCoords)
+  );
+
+  const processedDrones = visibleDrones.map((drone) => ({
+    ...drone,
+    inDefenseZone: isPointInPolygon(drone.lat, drone.lon, defenseBoundaryCoords),
+  }));
+
   res.json({
-    drones: mockDroneData,
+    drones: processedDrones,
     defenseZone: defenseBoundaryCoords,
     alertZone: alertZoneCoords,
     initialRegion: initialMapRegion,

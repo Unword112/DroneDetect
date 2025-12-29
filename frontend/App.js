@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { ThemeProvider } from './context/ThemeContext';
+
 import { Ionicons } from "@expo/vector-icons";
 
 import { subscribe, getUnreadCount } from "./pages/configscreen/alertStore";
@@ -83,69 +85,71 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          headerTransparent: true,
-          headerTintColor: "#000000ff",
-          headerTitleStyle: { fontWeight: "bold" },
-          headerRight: () => <MenuButton />,
-        }}
-      >
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{
-            headerShown: false,
-            gestureEnabled: false,
+    <ThemeProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{
+            headerTransparent: true,
+            headerTintColor: "#000000ff",
+            headerTitleStyle: { fontWeight: "bold" },
+            headerRight: () => <MenuButton />,
           }}
-        />
+        >
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
 
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{ headerShown: false }} // ซ่อน Header เพราะเราทำปุ่ม Back เองแล้ว
-        />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{ headerShown: false }} // ซ่อน Header เพราะเราทำปุ่ม Back เองแล้ว
+          />
 
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: "" }}
-        />
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ title: "" }}
+          />
 
-        <Stack.Screen
-          name="Alert"
-          component={AlertScreen}
-          options={{ title: "" }}
-        />
-        <Stack.Screen
-          name="Report"
-          component={ReportScreen}
-          options={{ title: "" }}
-        />
-        <Stack.Screen
-          name="Option"
-          component={OptionScreen}
-          options={{ title: "" }}
-        />
-        <Stack.Screen
-          name="Account"
-          component={AccountScreen}
-          options={{ title: "" }}
-        />
-        <Stack.Screen
-          name="Camera"
-          component={CameraScreen}
-          options={{ title: "" }}
-        />
-        <Stack.Screen
-          name="EditZone"
-          component={EditZoneScreen}
-          options={{ title: "" }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen
+            name="Alert"
+            component={AlertScreen}
+            options={{ title: "" }}
+          />
+          <Stack.Screen
+            name="Report"
+            component={ReportScreen}
+            options={{ title: "" }}
+          />
+          <Stack.Screen
+            name="Option"
+            component={OptionScreen}
+            options={{ title: "" }}
+          />
+          <Stack.Screen
+            name="Account"
+            component={AccountScreen}
+            options={{ title: "" }}
+          />
+          <Stack.Screen
+            name="Camera"
+            component={CameraScreen}
+            options={{ title: "" }}
+          />
+          <Stack.Screen
+            name="EditZone"
+            component={EditZoneScreen}
+            options={{ title: "" }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
 

@@ -5,10 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Image,
 } from "react-native";
+import { useTheme } from "../context/ThemeContext"; 
 
 const DroneList = ({ drones, selectedDrone, onSelect }) => {
+  const { theme } = useTheme();
+  const colors = theme.colors;
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -22,11 +25,21 @@ const DroneList = ({ drones, selectedDrone, onSelect }) => {
               activeOpacity={0.7}
             >
               <View
-                style={[styles.listItem, isSelected && styles.selectedItem]}
+                style={[
+                  styles.listItem, 
+                  isSelected && styles.selectedItem
+                ]}
               >
-                <Text style={styles.targetText} numberOfLines={1}>
+                <Text 
+                  style={[
+                    styles.targetText, 
+                    { color: isSelected ? '#007AFF' : colors.text }
+                  ]} 
+                  numberOfLines={1}
+                >
                   {drone.name}
                 </Text>
+                
                 <View
                   style={[
                     styles.indicator,
@@ -34,7 +47,7 @@ const DroneList = ({ drones, selectedDrone, onSelect }) => {
                   ]}
                 />
               </View>
-              <Text style={styles.subText}>{drone.distance} m</Text>
+              <Text style={[styles.subText, { color: colors.subText }]}>{drone.distance} m</Text>
             </TouchableOpacity>
           );
         })}
@@ -48,7 +61,6 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "black",
     marginBottom: 15,
   },
   itemWrapper: { marginBottom: 10 },
@@ -61,10 +73,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  selectedItem: { backgroundColor: "#F0F8FF" },
-  targetText: { fontSize: 16, fontWeight: "600", flex: 1, color: "#333" },
+  selectedItem: { backgroundColor: "rgba(0, 122, 255, 0.1)" },
+  targetText: { fontSize: 16, fontWeight: "600", flex: 1 },
   indicator: { width: 12, height: 12, borderRadius: 6 },
-  subText: { fontSize: 12, color: "#868686", marginTop: 2, paddingLeft: 12 },
+  subText: { fontSize: 12, marginTop: 2, paddingLeft: 12 },
 });
 
 export default DroneList;

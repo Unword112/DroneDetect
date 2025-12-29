@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../context/ThemeContext";
 import { IP_HOST } from "@env";
 
 const OptionScreen = ({ navigation }) => {
@@ -17,30 +18,16 @@ const OptionScreen = ({ navigation }) => {
   const [showDefenseZone, setShowDefenseZone] = useState(true);
   const [showAlertZone, setShowAlertZone] = useState(true);
 
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: () => navigation.navigate("Home"),
-      },
-    ]);
-  };
+  const { isDarkMode, toggleTheme, theme } = useTheme(); 
+  const colors = theme.colors;
 
-  const SettingItem = ({
-    icon,
-    label,
-    value,
-    onValueChange,
-    type = "switch",
-  }) => (
-    <View style={styles.itemContainer}>
+  const SettingItem = ({ icon, label, value, onValueChange, type = "switch" }) => (
+    <View style={[styles.itemContainer, { borderBottomColor: colors.border }]}> 
       <View style={styles.itemLeft}>
-        <View style={styles.iconBox}>
+        <View style={[styles.iconBox, { backgroundColor: isDarkMode ? '#333' : '#E5F1FF' }]}>
           <Ionicons name={icon} size={20} color="#007AFF" />
         </View>
-        <Text style={styles.itemText}>{label}</Text>
+        <Text style={[styles.itemText, { color: colors.text }]}>{label}</Text> 
       </View>
 
       {type === "switch" ? (
@@ -51,20 +38,25 @@ const OptionScreen = ({ navigation }) => {
           value={value}
         />
       ) : (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.valueText}>{value}</Text>
-          {type === "link" && (
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          )}
-        </View>
+        <Text style={[styles.valueText, { color: colors.subText }]}>{value}</Text>
       )}
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#000' : '#F2F2F7' }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.headerTitle}>Settings</Text>
+
+        <Text style={styles.sectionHeader}>APPEARANCE</Text>
+        <View style={[styles.sectionBlock, { backgroundColor: colors.surface }]}>
+          <SettingItem
+            icon="moon"
+            label="Dark Mode"
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+          />
+        </View>
 
         <Text style={styles.sectionHeader}>NOTIFICATIONS</Text>
         <View style={styles.sectionBlock}>
@@ -177,7 +169,6 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    color: "#000",
   },
   valueText: {
     fontSize: 16,
@@ -187,7 +178,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#f0f0f0",
-    marginLeft: 50, // เว้นตรงไอคอนไว้
+    marginLeft: 50,
   },
   logoutBtn: {
     paddingVertical: 15,

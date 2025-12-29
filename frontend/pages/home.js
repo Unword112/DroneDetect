@@ -18,22 +18,6 @@ import { IP_HOST } from "@env";
 
 const API_URL = `http://${IP_HOST}:3000/api/home-data`;
 
-const isPointInPolygon = (point, polygon) => {
-  const x = point.lat;
-  const y = point.lon;
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].latitude,
-      yi = polygon[i].longitude;
-    const xj = polygon[j].latitude,
-      yj = polygon[j].longitude;
-    const intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-    if (intersect) inside = !inside;
-  }
-  return inside;
-};
-
 const HomeScreen = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const headerHeight = useHeaderHeight();
@@ -77,12 +61,10 @@ const HomeScreen = ({ navigation }) => {
           const response = await fetch(API_URL);
           const data = await response.json();
 
-          const visibleDrones = data.drones.filter((drone) =>
-            isPointInPolygon(drone, data.alertZone),
-          );
+          const visibleDrones = data.drones;
 
           visibleDrones.forEach((drone) => {
-            if (isPointInPolygon(drone, data.defenseZone)) {
+            if (drone.inDefenseZone) {
               if (!alertedDrones.current.has(drone.id)) {
                 addAlert(drone.name);
                 alertedDrones.current.add(drone.id);

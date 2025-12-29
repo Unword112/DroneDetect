@@ -15,6 +15,7 @@ import DroneList from "../DroneList";
 import DroneDetail from "../DroneDetail";
 import DroneMap from "../DroneMap";
 import ToggleCameraMap from "../ToggleCameraMap";
+import { useTheme } from "../../context/ThemeContext"; 
 import { IP_HOST } from "@env";
 
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
@@ -35,6 +36,9 @@ const MobileHome = ({
   modalVisible,
   setModalVisible,
 }) => {
+  const { theme } = useTheme();
+  const colors = theme.colors;
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
@@ -70,7 +74,7 @@ const MobileHome = ({
   }, [modalVisible]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.mapMobile, { paddingTop: 0 }]}>
         {viewMode === "camera" ? (
           <View style={{ flex: 1, backgroundColor: "black" }}>
@@ -104,7 +108,7 @@ const MobileHome = ({
         </View>
       </View>
 
-      <View style={styles.infoContainerMobile}>
+      <View style={[styles.infoContainerMobile, { backgroundColor: colors.surface }]}>
         <DroneList
           drones={drones}
           selectedDrone={selectedDrone}
@@ -127,19 +131,27 @@ const MobileHome = ({
           <Animated.View
             style={[
               styles.modalContent,
-              { transform: [{ translateY: slideAnim }] },
+              { 
+                transform: [{ translateY: slideAnim }],
+                backgroundColor: colors.surface // เปลี่ยนสีพื้นหลัง Modal
+              },
             ]}
           >
-            <View style={styles.modalIndicator} />
-            <Text style={styles.modalHeader}>DRONE DETECTED</Text>
-            <Text style={styles.modalTitle}>{selectedDrone?.name}</Text>
-            <View style={styles.divider} />
+            <View style={[styles.modalIndicator, { backgroundColor: colors.border }]} />
+            
+            <Text style={[styles.modalHeader, { color: colors.subText }]}>DRONE DETECTED</Text>
+            
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{selectedDrone?.name}</Text>
+            
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            
             <DroneDetail drone={selectedDrone} />
+            
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={{ color: "#666" }}>Close</Text>
+              <Text style={{ color: colors.subText }}>Close</Text>
             </TouchableOpacity>
           </Animated.View>
         </Animated.View>
@@ -149,16 +161,18 @@ const MobileHome = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  // ลบ backgroundColor: '#fff' ออกจาก container เพื่อให้ override ได้ง่าย
+  container: { flex: 1 }, 
   mapMobile: { width: "100%", height: "70%" },
-  infoContainerMobile: { height: "30%", padding: 15, backgroundColor: "#fff" },
+  // ลบ backgroundColor ออกจาก infoContainerMobile
+  infoContainerMobile: { height: "30%", padding: 15 }, 
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
+    // ลบ backgroundColor ออก
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -168,24 +182,21 @@ const styles = StyleSheet.create({
   modalIndicator: {
     width: 40,
     height: 5,
-    backgroundColor: "#ccc",
     borderRadius: 3,
     alignSelf: "center",
     marginBottom: 15,
   },
   modalHeader: {
     fontSize: 12,
-    color: "#868686",
     fontWeight: "500",
     textTransform: "uppercase",
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "black",
     marginVertical: 5,
   },
-  divider: { height: 1, backgroundColor: "#eee", marginVertical: 10 },
+  divider: { height: 1, marginVertical: 10 },
   closeButton: { alignItems: "center", padding: 15, marginTop: 10 },
 });
 
