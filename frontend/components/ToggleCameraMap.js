@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const ToggleCameraMap = ({ activeMode, onToggle }) => {
   const lastPressTime = useRef(0);
-  const DELAY_MS = 500;
+  const DELAY_MS = 700;
 
   const handlePress = (mode) => {
     const now = Date.now();

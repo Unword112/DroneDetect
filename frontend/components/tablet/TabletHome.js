@@ -1,19 +1,11 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import DroneList from "../DroneList";
 import DroneDetail from "../DroneDetail";
 import DroneMap from "../DroneMap";
 import ToggleCameraMap from "../ToggleCameraMap";
-import BottomTab from "../tablet/BottomTab";
 import { IP_HOST } from "@env";
 
 import { useTheme } from "../../context/ThemeContext";
@@ -21,8 +13,7 @@ import { useTheme } from "../../context/ThemeContext";
 const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
 
-const TabletHome = ({
-  navigation,
+const DesktopHome = ({
   drones,
   selectedDrone,
   handleDroneSelect,
@@ -40,18 +31,13 @@ const TabletHome = ({
   const colors = theme.colors;
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-        paddingTop: Platform.OS === "android" ? 30 : 0,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flex: 1, flexDirection: "row" }}>
         {sidebarLevel >= 1 && (
-          <View style={[styles.colList, { borderColor: colors.border }]}> 
+          <View style={[styles.colList, { borderColor: colors.border }]}>
             <View style={styles.columnHeader}>
               <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
+              
               <TouchableOpacity onPress={() => setSidebarLevel(0)}>
                 <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
               </TouchableOpacity>
@@ -84,9 +70,10 @@ const TabletHome = ({
         )}
 
         {sidebarLevel >= 2 && (
-          <View style={[styles.colDetail, { borderColor: colors.border }]}> 
+          <View style={[styles.colDetail, { borderColor: colors.border }]}>
             <View style={styles.columnHeader}>
               <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
+              
               <TouchableOpacity onPress={() => setSidebarLevel(1)}>
                 <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
               </TouchableOpacity>
@@ -95,29 +82,11 @@ const TabletHome = ({
           </View>
         )}
 
+        {/* ✅ ปรับปรุงส่วนแสดงผลแผนที่/กล้อง (ใช้ซ้อน Layer) */}
         <View style={{ flex: 5, position: "relative" }}>
-          {sidebarLevel === 0 && (
-            <TouchableOpacity
-              style={[styles.sidebarToggleBtn, { backgroundColor: colors.surface }]}
-              onPress={() => setSidebarLevel(2)}
-            >
-              <Ionicons name="list" size={24} color="#007AFF" />
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.toggleWrapper}>
-            <ToggleCameraMap activeMode={viewMode} onToggle={setViewMode} />
-          </View>
-
-          {viewMode === "camera" ? (
-            <View style={{ flex: 1, backgroundColor: "black" }}>
-              <Image
-                source={{ uri: CAMERA_FEED_URL }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
-            </View>
-          ) : (
+          
+          {/* 1. Map: อยู่ชั้นล่างสุด แสดงผลตลอดเวลา (ห้ามลบ) */}
+          <View style={StyleSheet.absoluteFill}>
             <DroneMap
               style={{ width: "100%", height: "100%" }}
               drones={drones}
@@ -127,10 +96,36 @@ const TabletHome = ({
               onRegionChange={handleRegionChange}
               isTablet={true}
             />
+          </View>
+
+          {/* 2. Camera: วางทับเมื่อเลือกโหมด camera */}
+          {viewMode === "camera" && (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: "black", zIndex: 10 }]}>
+              <Image
+                source={{ uri: CAMERA_FEED_URL }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
           )}
+
+          {/* ปุ่มเปิด Sidebar */}
+          {sidebarLevel === 0 && (
+            <TouchableOpacity
+              style={[styles.sidebarToggleBtn, { backgroundColor: colors.surface }]}
+              onPress={() => setSidebarLevel(2)}
+            >
+              <Ionicons name="list" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          )}
+
+          {/* ปุ่มสลับโหมด Map/Camera (วางบนสุด) */}
+          <View style={styles.toggleWrapper}>
+            <ToggleCameraMap activeMode={viewMode} onToggle={setViewMode} />
+          </View>
+
         </View>
       </View>
-      <BottomTab navigation={navigation} />
     </View>
   );
 };
@@ -138,10 +133,11 @@ const TabletHome = ({
 const styles = StyleSheet.create({
   colList: { flex: 2, padding: 20, borderRightWidth: 1 },
   colDetail: { flex: 3, padding: 20, borderRightWidth: 1 },
-  columnHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
+  columnHeader: { 
+    marginBottom: 15, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    alignItems: 'center' 
   },
   headerText: { fontSize: 16, fontWeight: "bold" },
   liveCameraBox: {
@@ -159,18 +155,6 @@ const styles = StyleSheet.create({
     top: 20,
     alignSelf: "center",
     zIndex: 50,
-  },
-  sidebarToggleBtn: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 20,
-    padding: 10,
-    borderRadius: 8,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
   },
   liveHeader: {
     position: "absolute",
@@ -192,6 +176,19 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   liveText: { color: "white", fontSize: 10, fontWeight: "bold" },
+  sidebarToggleBtn: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 20,
+    padding: 10,
+    borderRadius: 8,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
 });
 
-export default TabletHome;
+export default DesktopHome;

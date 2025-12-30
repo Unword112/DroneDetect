@@ -22,7 +22,7 @@ const TopNavBar = () => {
 
   const menuItems = [
     { name: "Home", icon: "home", route: "Home", label: "HOME" },
-    { name: "Edit Zone", icon: "create", route: "EditZone", label: "ZONES" }, // เพิ่มเมนูนี้เข้ามา
+    { name: "Edit Zone", icon: "create", route: "EditZone", label: "ZONES" },
     { name: "Alert", icon: "notifications", route: "Alert", label: "ALERT", hasBadge: true },
     { name: "Report", icon: "document-text", route: "Report", label: "REPORT" },
     { name: "Option", icon: "settings", route: "Option", label: "OPTION" },
@@ -31,9 +31,9 @@ const TopNavBar = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      <View>
-        <Text style={{ fontSize: 16, color: "blue", paddingRight: 700}}>LOGO</Text>  
-      </View>
+      {/*<View>
+        <Text style={{ fontSize: 16, color: "blue", paddingRight: 900}}>LOGO</Text>  
+      </View> */}
       
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => {

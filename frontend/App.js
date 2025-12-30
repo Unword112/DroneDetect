@@ -9,11 +9,13 @@ import {
 } from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { ThemeProvider } from './context/ThemeContext';
+
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 import { Ionicons } from "@expo/vector-icons";
 
 import { subscribe, getUnreadCount } from "./pages/configscreen/alertStore";
+import TopNavBar from "./components/desktop/TopNavBar";
 
 import AccountScreen from "./pages/account";
 import AlertScreen from "./pages/alert";
@@ -35,6 +37,9 @@ function MenuButton() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
+  const { theme } = useTheme();
+  const colors = theme.colors;
+
   const [unreadCount, setUnreadCount] = React.useState(getUnreadCount());
 
   React.useEffect(() => {
@@ -51,26 +56,20 @@ function MenuButton() {
     navigation.navigate(screenName);
   };
 
-  return (
+return (
     <View style={{ marginRight: 15 }}>
       <TouchableOpacity onPress={toggleMenu}>
         <Ionicons
-          name={
-            Platform.OS === "ios"
-              ? "ellipsis-horizontal"
-              : "ellipsis-horizontal-sharp"
-          }
+          name={Platform.OS === "ios" ? "ellipsis-horizontal" : "ellipsis-horizontal-sharp"}
           size={24}
-          color="#000000ff"
+          color={colors.text}
         />
-
         {unreadCount > 0 && (
           <View style={styles.exclamationBadge}>
             <Text style={styles.exclamationText}>!</Text>
           </View>
         )}
       </TouchableOpacity>
-
       <MenuPopover
         isVisible={isMenuVisible}
         onClose={() => setMenuVisible(false)}
@@ -83,72 +82,54 @@ function MenuButton() {
 
 const Stack = createStackNavigator();
 
+function MainNavigator() {
+  const { theme } = useTheme();
+  const colors = theme.colors;
+  const { width } = useWindowDimensions();
+  
+  // ✅ 2. เช็คว่าเป็น Desktop หรือไม่
+  const isDesktop = width >= 1024;
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{
+          header: isDesktop ? () => <TopNavBar /> : undefined,
+          headerShown: true, 
+          headerTransparent: isDesktop ? false : true,
+          headerTintColor: colors.text,
+          headerTitleStyle: { fontWeight: "bold", color: colors.text },
+          headerRight: isDesktop ? null : () => <MenuButton />,
+        }}
+      >
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: "" }} />
+        <Stack.Screen name="Alert" component={AlertScreen} options={{ title: "" }} />
+        <Stack.Screen name="Report" component={ReportScreen} options={{ title: "" }} />
+        <Stack.Screen name="Option" component={OptionScreen} options={{ title: "" }} />
+        <Stack.Screen name="Account" component={AccountScreen} options={{ title: "" }} />
+        <Stack.Screen name="Camera" component={CameraScreen} options={{ title: "" }} />
+        <Stack.Screen name="EditZone" component={EditZoneScreen} options={{ title: "" }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Login"
-          screenOptions={{
-            headerTransparent: true,
-            headerTintColor: "#000000ff",
-            headerTitleStyle: { fontWeight: "bold" },
-            headerRight: () => <MenuButton />,
-          }}
-        >
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{ headerShown: false }} // ซ่อน Header เพราะเราทำปุ่ม Back เองแล้ว
-          />
-
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ title: "" }}
-          />
-
-          <Stack.Screen
-            name="Alert"
-            component={AlertScreen}
-            options={{ title: "" }}
-          />
-          <Stack.Screen
-            name="Report"
-            component={ReportScreen}
-            options={{ title: "" }}
-          />
-          <Stack.Screen
-            name="Option"
-            component={OptionScreen}
-            options={{ title: "" }}
-          />
-          <Stack.Screen
-            name="Account"
-            component={AccountScreen}
-            options={{ title: "" }}
-          />
-          <Stack.Screen
-            name="Camera"
-            component={CameraScreen}
-            options={{ title: "" }}
-          />
-          <Stack.Screen
-            name="EditZone"
-            component={EditZoneScreen}
-            options={{ title: "" }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <MainNavigator />
     </ThemeProvider>
   );
 }

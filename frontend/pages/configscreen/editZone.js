@@ -27,6 +27,8 @@ const EditZoneScreen = ({ navigation }) => {
   const startLat = currentMapRegion?.latitude || 13.785;
   const startLon = currentMapRegion?.longitude || 100.55;
 
+  console.log(currentMapRegion);
+
   const [defenseCoords, setDefenseCoords] = useState(
     createSquare(startLat, startLon, 0.001),
   );
@@ -63,7 +65,7 @@ const EditZoneScreen = ({ navigation }) => {
 
       if (result.success) {
         Alert.alert("สำเร็จ", "บันทึกโซนเรียบร้อยแล้ว", [
-          { text: "OK", onPress: () => navigation.goBack() }, // บันทึกเสร็จให้กลับไปหน้าเดิม
+          { text: "OK", onPress: () => navigation.goBack() },
         ]);
       }
     } catch (error) {
@@ -125,10 +127,10 @@ const EditZoneScreen = ({ navigation }) => {
       </MapView>
 
       <View style={styles.bottomContainer}>
-        <Text style={styles.text}>ลากจุดเพื่อปรับแต่งพื้นที่</Text>
+        <Text style={styles.text}>ลากจุดเพื่อปรับพื้นที่</Text>
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>บันทึกโซน (Save)</Text>
+          <Text style={styles.saveButtonText}>บันทึก (Save)</Text>
         </TouchableOpacity>
       </View>
     </View>

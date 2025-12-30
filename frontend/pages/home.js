@@ -82,8 +82,10 @@ const HomeScreen = ({ navigation }) => {
 
           if (!mapInitialized.current && data.initialRegion) {
             setinitialRegion(data.initialRegion);
+            setMapRegion(data.initialRegion);
             mapInitialized.current = true;
           }
+          console.log(initialRegion);
 
           if (data.detail) setAllDroneDetails(data.detail);
         } catch (error) {
@@ -105,7 +107,7 @@ const HomeScreen = ({ navigation }) => {
     setSelectedDrone(mergedData);
 
     if (!isDesktop && !isTablet) setModalVisible(true);
-    if (isTablet && sidebarLevel < 2) setSidebarLevel(2);
+    if ((isTablet || isDesktop) && sidebarLevel < 2) setSidebarLevel(2);
   };
 
   if (loading) {
@@ -132,7 +134,13 @@ const HomeScreen = ({ navigation }) => {
   };
 
   if (isDesktop) {
-    return <DesktopHome {...commonProps} />;
+    return (
+      <DesktopHome 
+        {...commonProps} 
+        sidebarLevel={sidebarLevel}
+        setSidebarLevel={setSidebarLevel}
+      />
+    );
   }
 
   if (isTablet) {

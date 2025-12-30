@@ -118,7 +118,6 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  // ✅ 2. รวม Props เพื่อส่งไปให้ LoginForm
   const formProps = {
     username,
     setUsername,
@@ -135,14 +134,13 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.desktopContainer}>
         <View style={styles.leftPanel}>
            <View style={{alignItems: 'center'}}>
-              <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white'}}>SECURE SKY</Text>
+              <Text style={{fontSize: 40, fontWeight: 'bold', color: 'white'}}>DRONE DETECT APP</Text>
               <Text style={{fontSize: 18, color: 'white', marginTop: 10}}>Advanced Drone Monitoring System</Text>
            </View>
         </View>
         
         <View style={styles.rightPanel}>
           <View style={{ width: 400 }}> 
-            {/* ✅ 3. เรียกใช้โดยส่ง Props เข้าไป */}
             <LoginForm {...formProps} />
           </View>
         </View>
@@ -157,7 +155,6 @@ const LoginScreen = ({ navigation }) => {
         style={styles.container}
       >
         <View style={styles.innerContainer}>
-          {/* ✅ 3. เรียกใช้โดยส่ง Props เข้าไป */}
           <LoginForm {...formProps} />
         </View>
       </KeyboardAvoidingView>

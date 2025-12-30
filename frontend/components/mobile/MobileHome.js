@@ -76,24 +76,26 @@ const MobileHome = ({
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.mapMobile, { paddingTop: 0 }]}>
-        {viewMode === "camera" ? (
-          <View style={{ flex: 1, backgroundColor: "black" }}>
+        <View style={StyleSheet.absoluteFill}>
+            <DroneMap
+                style={{ width: "100%", height: "100%" }}
+                drones={drones}
+                alertZone={alertZone}
+                defenseZone={defenseZone}
+                initialRegion={initialRegion}
+                onRegionChange={handleRegionChange}
+                isTablet={false}
+            />
+        </View>
+
+        {viewMode === "camera" && (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: "black", zIndex: 10 }]}>
             <Image
               source={{ uri: CAMERA_FEED_URL }}
               style={{ width: "100%", height: "100%" }}
               resizeMode="cover"
             />
           </View>
-        ) : (
-          <DroneMap
-            style={{ width: "100%", height: "100%" }}
-            drones={drones}
-            alertZone={alertZone}
-            defenseZone={defenseZone}
-            initialRegion={initialRegion}
-            onRegionChange={handleRegionChange}
-            isTablet={false}
-          />
         )}
 
         <View
@@ -161,10 +163,8 @@ const MobileHome = ({
 };
 
 const styles = StyleSheet.create({
-  // ลบ backgroundColor: '#fff' ออกจาก container เพื่อให้ override ได้ง่าย
   container: { flex: 1 }, 
   mapMobile: { width: "100%", height: "70%" },
-  // ลบ backgroundColor ออกจาก infoContainerMobile
   infoContainerMobile: { height: "30%", padding: 15 }, 
   modalOverlay: {
     flex: 1,
@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    // ลบ backgroundColor ออก
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,

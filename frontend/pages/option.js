@@ -5,13 +5,16 @@ import {
   StyleSheet,
   Switch,
   ScrollView,
-  Alert,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
 import { IP_HOST } from "@env";
 
 const OptionScreen = ({ navigation }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   const [isSoundOn, setSoundOn] = useState(true);
   const [isVibrationOn, setVibrationOn] = useState(true);
   const [showDefenseZone, setShowDefenseZone] = useState(true);
@@ -44,7 +47,12 @@ const OptionScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        contentContainerStyle={[
+          styles.scrollContent, 
+          isDesktop && styles.scrollContentDesktop
+        ]}
+      >
         <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
 
         <Text style={[styles.sectionHeader, { color: colors.subText }]}>APPEARANCE</Text>
@@ -119,10 +127,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    top: 25,
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 100, 
     paddingBottom: 50,
+  },
+  scrollContentDesktop: {
+    paddingTop: 40, 
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 900, 
+    paddingHorizontal: 40,
   },
   headerTitle: {
     fontSize: 30,
@@ -135,32 +149,34 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 15,
     marginLeft: 10,
+    textTransform: "uppercase",
   },
   sectionBlock: {
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: "hidden",
   },
   itemContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   itemLeft: {
     flexDirection: "row",
     alignItems: "center",
   },
   iconBox: {
-    width: 30,
-    height: 30,
-    borderRadius: 6,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 14,
   },
   itemText: {
     fontSize: 16,
+    fontWeight: "500",
   },
   valueText: {
     fontSize: 16,
@@ -168,7 +184,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    marginLeft: 50,
+    marginLeft: 60,
   },
   versionText: {
     textAlign: "center",

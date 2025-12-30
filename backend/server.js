@@ -142,7 +142,8 @@ app.get("/api/report-data", (req, res) => {
     isPointInPolygon(log.lat, log.lon, defenseBoundaryCoords),
   ).length;
 
-  const todayIndex = new Date().getDate();
+  const todayIndex = new Date().getDay();
+  console.log(todayIndex);
   weeklyCounts[todayIndex] = totalDetected;
 
   const topOffenders = droneHistoryLogs.map((log) => ({

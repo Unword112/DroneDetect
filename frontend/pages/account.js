@@ -15,7 +15,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { IP_HOST } from "@env";
 
 import { useTheme } from "../context/ThemeContext";
-import TopNavBar from "../components/desktop/TopNavBar"; 
 
 const API_URL = `http://${IP_HOST}:3000/api/login`;
 
@@ -163,7 +162,7 @@ const AccountScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {isDesktop && <TopNavBar />}
+      {isDesktop}
 
       <ScrollView contentContainerStyle={isDesktop ? styles.scrollContentDesktop : styles.scrollContent}>
         <Text style={[styles.headerTitle, { color: colors.text, marginBottom: isDesktop ? 40 : 20 }]}>

@@ -6,7 +6,6 @@ import DroneList from "../DroneList";
 import DroneDetail from "../DroneDetail";
 import DroneMap from "../DroneMap";
 import ToggleCameraMap from "../ToggleCameraMap";
-import TopNavBar from "./TopNavBar";
 import { IP_HOST } from "@env";
 
 import { useTheme } from "../../context/ThemeContext";
@@ -25,53 +24,78 @@ const DesktopHome = ({
   defenseZone,
   initialRegion,
   handleRegionChange,
+  sidebarLevel,
+  setSidebarLevel,
 }) => {
   const { theme } = useTheme();
   const colors = theme.colors;
+  
+  //console.log("initialRegion" , initialRegion);
+  //console.log("handleRegionChange" , handleRegionChange);
 
-  return (
+ return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <TopNavBar />
 
       <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={[styles.colList, { borderColor: colors.border }]}>
-          <View style={styles.columnHeader}>
-            <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <DroneList
-              drones={drones}
-              selectedDrone={selectedDrone}
-              onSelect={handleDroneSelect}
-            />
-          </View>
-          <View style={styles.liveCameraBox}>
-            <View style={styles.liveHeader}>
-              <View style={styles.redDot} />
-              <Text style={styles.liveText}>
-                {selectedDrone ? "TRACKING" : "AUTO TRACKING"}
-              </Text>
+        {sidebarLevel >= 1 && (
+          <View style={[styles.colList, { borderColor: colors.border }]}>
+            <View style={styles.columnHeader}>
+              <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
+              
+              <TouchableOpacity onPress={() => setSidebarLevel(0)}>
+                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
+              </TouchableOpacity>
             </View>
-            <Image
-              source={{
-                uri: selectedDrone
-                  ? getImageUrl(selectedDrone.imageUrl)
-                  : SIDE_CAMERA_URL,
-              }}
-              style={styles.liveImage}
-              resizeMode="cover"
-            />
+            <View style={{ flex: 1 }}>
+              <DroneList
+                drones={drones}
+                selectedDrone={selectedDrone}
+                onSelect={handleDroneSelect}
+              />
+            </View>
+            <View style={styles.liveCameraBox}>
+              <View style={styles.liveHeader}>
+                <View style={styles.redDot} />
+                <Text style={styles.liveText}>
+                  {selectedDrone ? "TRACKING" : "AUTO TRACKING"}
+                </Text>
+              </View>
+              <Image
+                source={{
+                  uri: selectedDrone
+                    ? getImageUrl(selectedDrone.imageUrl)
+                    : SIDE_CAMERA_URL,
+                }}
+                style={styles.liveImage}
+                resizeMode="cover"
+              />
+            </View>
           </View>
-        </View>
-
-        <View style={[styles.colDetail, { borderColor: colors.border }]}>
-          <View style={styles.columnHeader}>
-            <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
+        )}
+        {sidebarLevel >= 2 && (
+          <View style={[styles.colDetail, { borderColor: colors.border }]}>
+            <View style={styles.columnHeader}>
+              <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
+              
+              <TouchableOpacity onPress={() => setSidebarLevel(1)}>
+                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
+              </TouchableOpacity>
+            </View>
+            <DroneDetail drone={selectedDrone} />
           </View>
-          <DroneDetail drone={selectedDrone} />
-        </View>
+        )}
 
         <View style={{ flex: 5, position: "relative" }}>
+          
+          {sidebarLevel === 0 && (
+            <TouchableOpacity
+              style={[styles.sidebarToggleBtn, { backgroundColor: colors.surface }]}
+              onPress={() => setSidebarLevel(2)}
+            >
+              <Ionicons name="list" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          )}
+
           <View style={styles.toggleWrapper}>
             <ToggleCameraMap activeMode={viewMode} onToggle={setViewMode} />
           </View>
@@ -102,9 +126,14 @@ const DesktopHome = ({
 };
 
 const styles = StyleSheet.create({
-  colList: { flex: 2, padding: 20, borderRightWidth: 1 }, 
+  colList: { flex: 2, padding: 20, borderRightWidth: 1 },
   colDetail: { flex: 3, padding: 20, borderRightWidth: 1 },
-  columnHeader: { marginBottom: 15 },
+  columnHeader: { 
+    marginBottom: 15, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    alignItems: 'center' 
+  },
   headerText: { fontSize: 16, fontWeight: "bold" },
   liveCameraBox: {
     height: 180,
@@ -142,6 +171,20 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   liveText: { color: "white", fontSize: 10, fontWeight: "bold" },
+  
+  sidebarToggleBtn: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 20,
+    padding: 10,
+    borderRadius: 8,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
 });
 
 export default DesktopHome;
