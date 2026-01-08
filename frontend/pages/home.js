@@ -37,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
   const [selectedDrone, setSelectedDrone] = useState(null);
   const [allDroneDetails, setAllDroneDetails] = useState([]);
 
-  const [sidebarLevel, setSidebarLevel] = useState(2);
+  const [sidebarLevel, setSidebarLevel] = useState(0);
   const [viewMode, setViewMode] = useState("map");
   const [modalVisible, setModalVisible] = useState(false);
 
