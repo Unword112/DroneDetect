@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -10,17 +10,26 @@ import {
 
 const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
   const menuItems = [
-    { name: "EditZone", label: "Edit Zone" },
     { name: "Alert", label: "Alert" },
     { name: "Report", label: "Report" },
     { name: "Option", label: "Option" },
     { name: "Account", label: "Account" },
   ];
 
-  const handlePress = (screenName) => {
-    onClose();
-    onNavigate(screenName);
-  };
+  const lastPressTime = useRef(0);
+    const DELAY_MS = 700;
+    
+    const handlePress = (targetRoute) => {
+      const now = Date.now();
+  
+      if (now - lastPressTime.current < DELAY_MS) {
+        console.log("Too fast! Please wait.");
+        return; 
+      }
+  
+      lastPressTime.current = now;
+      navigation.navigate(targetRoute);
+    };
 
   return (
     <Modal
@@ -42,7 +51,7 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
                     styles.menuItem,
                     isLastItem && { borderBottomWidth: 0 },
                   ]}
-                  onPress={() => handlePress(item.name)}
+                  onPress={() => handlePress(item.route)}
                 >
                   <View style={styles.rowBetween}>
                     <Text style={styles.menuText}>{item.label}</Text>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +12,21 @@ const TopNavBar = () => {
 
   const { theme } = useTheme();
   const colors = theme.colors;
+
+  const lastPressTime = useRef(0);
+  const DELAY_MS = 700;
+  
+  const handlePress = (targetRoute) => {
+    const now = Date.now();
+
+    if (now - lastPressTime.current < DELAY_MS) {
+      console.log("Too fast! Please wait.");
+      return; 
+    }
+
+    lastPressTime.current = now;
+    navigation.navigate(targetRoute);
+  };
   
   const [unreadCount, setUnreadCount] = useState(getUnreadCount());
 
@@ -22,7 +37,6 @@ const TopNavBar = () => {
 
   const menuItems = [
     { name: "Home", icon: "home", route: "Home", label: "HOME" },
-    { name: "Edit Zone", icon: "create", route: "EditZone", label: "ZONES" },
     { name: "Alert", icon: "notifications", route: "Alert", label: "ALERT", hasBadge: true },
     { name: "Report", icon: "document-text", route: "Report", label: "REPORT" },
     { name: "Option", icon: "settings", route: "Option", label: "OPTION" },
@@ -44,7 +58,7 @@ const TopNavBar = () => {
             <TouchableOpacity
               key={index}
               style={styles.menuItem}
-              onPress={() => navigation.navigate(item.route)}
+              onPress={() => handlePress(item.route)}
             >
               <View>
                 <Ionicons

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
@@ -6,6 +6,21 @@ import { useRoute } from "@react-navigation/native";
 import { subscribe, getUnreadCount } from "../../pages/configscreen/alertStore";
 
 const BottomTab = ({ navigation }) => {
+  const lastPressTime = useRef(0);
+  const DELAY_MS = 700;
+
+  const handlePress = (mode) => {
+    const now = Date.now();
+
+    if (now - lastPressTime.current < DELAY_MS) {
+      return;
+    }
+
+    lastPressTime.current = now;
+    onToggle(mode);
+  };
+
+
   const route = useRoute();
   const currentRouteName = route.name;
   const [unreadCount, setUnreadCount] = useState(getUnreadCount());
@@ -17,7 +32,6 @@ const BottomTab = ({ navigation }) => {
 
   const menus = [
     { name: "Home", icon: "home", route: "Home" },
-    { name: "Edit Zone", icon: "create", route: "EditZone" },
     { name: "Alert", icon: "notifications", route: "Alert", hasBadge: true },
     { name: "Report", icon: "document-text", route: "Report" },
     { name: "Option", icon: "settings", route: "Option" },
@@ -34,7 +48,7 @@ const BottomTab = ({ navigation }) => {
           <TouchableOpacity
             key={index}
             style={styles.tabItem}
-            onPress={() => navigation.navigate(menu.route)}
+            onPress={() => handlePress(navigation.navigate(menu.route))}
           >
             <View>
               <Ionicons name={menu.icon} size={24} color={activeColor} />

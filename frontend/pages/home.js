@@ -12,7 +12,7 @@ import DesktopHome from "../components/desktop/DesktopHome";
 import TabletHome from "../components/tablet/TabletHome";
 import MobileHome from "../components/mobile/MobileHome";
 
-import { setMapRegion } from "./configscreen/locationStore";
+import { setMapRegion, currentMapRegion } from "./configscreen/locationStore";
 import { addAlert } from "./configscreen/alertStore";
 import { IP_HOST } from "@env";
 
@@ -25,13 +25,15 @@ const HomeScreen = ({ navigation }) => {
   const isDesktop = width >= 1024;
   const isTablet = width >= 768 && width < 1024;
 
-  console.log(width);
+  const mapRef = useRef(null);
+
+  //console.log(width);
 
   const [drones, setDrones] = useState([]);
   const [defenseZone, setDefenseZone] = useState([]);
   const [alertZone, setAlertZone] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [initialRegion, setinitialRegion] = useState(null);
+  const [initialRegion, setinitialRegion] = useState(currentMapRegion);
   const mapInitialized = useRef(false);
 
   const [selectedDrone, setSelectedDrone] = useState(null);
@@ -56,7 +58,13 @@ const HomeScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      
+      if (mapRef.current && currentMapRegion) {
+          mapRef.current.animateToRegion(currentMapRegion, 1000);
+      }
+        
       const fetchHomeData = async () => {
+
         try {
           const response = await fetch(API_URL);
           const data = await response.json();
@@ -131,6 +139,7 @@ const HomeScreen = ({ navigation }) => {
     handleRegionChange,
     viewMode,
     setViewMode,
+    mapRef
   };
 
   if (isDesktop) {

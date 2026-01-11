@@ -14,8 +14,8 @@ import {
 import DroneList from "../DroneList";
 import DroneDetail from "../DroneDetail";
 import DroneMap from "../DroneMap";
-import ToggleCameraMap from "../ToggleCameraMap";
-import { useTheme } from "../../context/ThemeContext"; 
+import ToggleCameraMap from "../../pages/configscreen/ToggleCameraMap";
+import { useTheme } from "../../context/ThemeContext";
 import { IP_HOST } from "@env";
 
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
@@ -35,6 +35,7 @@ const MobileHome = ({
   headerHeight,
   modalVisible,
   setModalVisible,
+  mapRef,
 }) => {
   const { theme } = useTheme();
   const colors = theme.colors;
@@ -77,19 +78,25 @@ const MobileHome = ({
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.mapMobile, { paddingTop: 0 }]}>
         <View style={StyleSheet.absoluteFill}>
-            <DroneMap
-                style={{ width: "100%", height: "100%" }}
-                drones={drones}
-                alertZone={alertZone}
-                defenseZone={defenseZone}
-                initialRegion={initialRegion}
-                onRegionChange={handleRegionChange}
-                isTablet={false}
-            />
+          <DroneMap
+            ref={mapRef}
+            style={{ width: "100%", height: "100%" }}
+            drones={drones}
+            alertZone={alertZone}
+            defenseZone={defenseZone}
+            initialRegion={initialRegion}
+            onRegionChange={handleRegionChange}
+            isTablet={false}
+          />
         </View>
 
         {viewMode === "camera" && (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: "black", zIndex: 10 }]}>
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: "black", zIndex: 10 },
+            ]}
+          >
             <Image
               source={{ uri: CAMERA_FEED_URL }}
               style={{ width: "100%", height: "100%" }}
@@ -110,7 +117,12 @@ const MobileHome = ({
         </View>
       </View>
 
-      <View style={[styles.infoContainerMobile, { backgroundColor: colors.surface }]}>
+      <View
+        style={[
+          styles.infoContainerMobile,
+          { backgroundColor: colors.surface },
+        ]}
+      >
         <DroneList
           drones={drones}
           selectedDrone={selectedDrone}
@@ -133,22 +145,33 @@ const MobileHome = ({
           <Animated.View
             style={[
               styles.modalContent,
-              { 
+              {
                 transform: [{ translateY: slideAnim }],
-                backgroundColor: colors.surface 
+                backgroundColor: colors.surface,
               },
             ]}
           >
-            <View style={[styles.modalIndicator, { backgroundColor: colors.border }]} />
-            
-            <Text style={[styles.modalHeader, { color: colors.subText }]}>DRONE DETECTED</Text>
-    
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{selectedDrone?.name}</Text>
-            
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
-            
+            <View
+              style={[
+                styles.modalIndicator,
+                { backgroundColor: colors.border },
+              ]}
+            />
+
+            <Text style={[styles.modalHeader, { color: colors.subText }]}>
+              DRONE DETECTED
+            </Text>
+
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {selectedDrone?.name}
+            </Text>
+
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
+
             <DroneDetail drone={selectedDrone} />
-            
+
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
@@ -163,9 +186,9 @@ const MobileHome = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 }, 
+  container: { flex: 1 },
   mapMobile: { width: "100%", height: "70%" },
-  infoContainerMobile: { height: "30%", padding: 15 }, 
+  infoContainerMobile: { height: "30%", padding: 15 },
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",

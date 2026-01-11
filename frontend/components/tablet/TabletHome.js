@@ -5,7 +5,9 @@ import { Ionicons } from "@expo/vector-icons";
 import DroneList from "../DroneList";
 import DroneDetail from "../DroneDetail";
 import DroneMap from "../DroneMap";
-import ToggleCameraMap from "../ToggleCameraMap";
+import ToggleCameraMap from "../../pages/configscreen/ToggleCameraMap";
+import { useZoneSystem } from "../../hook/useZoneSystem";
+
 import { IP_HOST } from "@env";
 
 import { useTheme } from "../../context/ThemeContext";
@@ -26,9 +28,20 @@ const DesktopHome = ({
   handleRegionChange,
   sidebarLevel,
   setSidebarLevel,
+  mapRef,
 }) => {
   const { theme } = useTheme();
   const colors = theme.colors;
+
+  const {
+    isEditing,
+    editDefenseCoords,
+    editAlertCoords,
+    startEditing,
+    onMarkerDragEnd,
+    handleSave,
+    handleCancel,
+  } = useZoneSystem(initialRegion, defenseZone, alertZone);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -36,10 +49,16 @@ const DesktopHome = ({
         {sidebarLevel >= 1 && (
           <View style={[styles.colList, { borderColor: colors.border }]}>
             <View style={styles.columnHeader}>
-              <Text style={[styles.headerText, { color: colors.text }]}>Drone Detected</Text>
-              
+              <Text style={[styles.headerText, { color: colors.text }]}>
+                Drone Detected
+              </Text>
+
               <TouchableOpacity onPress={() => setSidebarLevel(0)}>
-                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
+                <Ionicons
+                  name="chevron-back-circle"
+                  size={24}
+                  color={colors.subText}
+                />
               </TouchableOpacity>
             </View>
             <View style={{ flex: 1 }}>
@@ -72,35 +91,51 @@ const DesktopHome = ({
         {sidebarLevel >= 2 && (
           <View style={[styles.colDetail, { borderColor: colors.border }]}>
             <View style={styles.columnHeader}>
-              <Text style={[styles.headerText, { color: colors.text }]}>Detail</Text>
-              
+              <Text style={[styles.headerText, { color: colors.text }]}>
+                Detail
+              </Text>
+
               <TouchableOpacity onPress={() => setSidebarLevel(1)}>
-                <Ionicons name="chevron-back-circle" size={24} color={colors.subText} />
+                <Ionicons
+                  name="chevron-back-circle"
+                  size={24}
+                  color={colors.subText}
+                />
               </TouchableOpacity>
             </View>
             <DroneDetail drone={selectedDrone} />
           </View>
         )}
 
-        {/* ✅ ปรับปรุงส่วนแสดงผลแผนที่/กล้อง (ใช้ซ้อน Layer) */}
         <View style={{ flex: 5, position: "relative" }}>
-          
-          {/* 1. Map: อยู่ชั้นล่างสุด แสดงผลตลอดเวลา (ห้ามลบ) */}
           <View style={StyleSheet.absoluteFill}>
             <DroneMap
+              ref={mapRef}
               style={{ width: "100%", height: "100%" }}
-              drones={drones}
-              alertZone={alertZone}
-              defenseZone={defenseZone}
+              drones={isEditing ? [] : drones}
+              alertZone={isEditing ? [] : alertZone}
+              defenseZone={isEditing ? [] : defenseZone}
               initialRegion={initialRegion}
               onRegionChange={handleRegionChange}
               isTablet={true}
-            />
+            >
+              {isEditing && (
+                <ZoneEditor
+                  defenseCoords={editDefenseCoords}
+                  alertCoords={editAlertCoords}
+                  onMarkerDragEnd={onMarkerDragEnd}
+                />
+              )}
+            </DroneMap>
           </View>
 
-          {/* 2. Camera: วางทับเมื่อเลือกโหมด camera */}
           {viewMode === "camera" && (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: "black", zIndex: 10 }]}>
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: "black", zIndex: 10 },
+              ]}
+            >
               <Image
                 source={{ uri: CAMERA_FEED_URL }}
                 style={{ width: "100%", height: "100%" }}
@@ -109,21 +144,77 @@ const DesktopHome = ({
             </View>
           )}
 
-          {/* ปุ่มเปิด Sidebar */}
+          <View style={styles.editControls}>
+            {!isEditing ? (
+              <TouchableOpacity
+                style={[styles.btn, { backgroundColor: colors.surface }]}
+                onPress={startEditing}
+              >
+                <Ionicons name="create-outline" size={24} color={colors.text} />
+                <Text
+                  style={{
+                    color: colors.text,
+                    fontWeight: "bold",
+                    marginLeft: 8,
+                  }}
+                >
+                  Edit Zones
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={[
+                    styles.btn,
+                    { backgroundColor: "#FF3B30", marginRight: 10 },
+                  ]}
+                  onPress={handleCancel}
+                >
+                  <Ionicons name="close" size={24} color="white" />
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      marginLeft: 5,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: "#34C759" }]}
+                  onPress={() => handleSave()}
+                >
+                  <Ionicons name="save" size={24} color="white" />
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      marginLeft: 5,
+                    }}
+                  >
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
           {sidebarLevel === 0 && (
             <TouchableOpacity
-              style={[styles.sidebarToggleBtn, { backgroundColor: colors.surface }]}
+              style={[
+                styles.sidebarToggleBtn,
+                { backgroundColor: colors.surface },
+              ]}
               onPress={() => setSidebarLevel(2)}
             >
               <Ionicons name="list" size={24} color="#007AFF" />
             </TouchableOpacity>
           )}
 
-          {/* ปุ่มสลับโหมด Map/Camera (วางบนสุด) */}
           <View style={styles.toggleWrapper}>
             <ToggleCameraMap activeMode={viewMode} onToggle={setViewMode} />
           </View>
-
         </View>
       </View>
     </View>
@@ -133,11 +224,11 @@ const DesktopHome = ({
 const styles = StyleSheet.create({
   colList: { flex: 2, padding: 20, borderRightWidth: 1 },
   colDetail: { flex: 3, padding: 20, borderRightWidth: 1 },
-  columnHeader: { 
-    marginBottom: 15, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between',
-    alignItems: 'center' 
+  columnHeader: {
+    marginBottom: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: { fontSize: 16, fontWeight: "bold" },
   liveCameraBox: {
@@ -188,6 +279,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+  },
+
+  editControls: { position: "absolute", top: 20, right: 20, zIndex: 100 },
+  btn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    elevation: 5,
   },
 });
 
