@@ -87,7 +87,6 @@ function MainNavigator() {
   const colors = theme.colors;
   const { width } = useWindowDimensions();
   
-  // ✅ 2. เช็คว่าเป็น Desktop หรือไม่
   const isDesktop = width >= 1024;
 
   return (
@@ -100,7 +99,6 @@ function MainNavigator() {
           headerTransparent: isDesktop ? false : true,
           headerTintColor: colors.text,
           headerTitleStyle: { fontWeight: "bold", color: colors.text },
-          headerRight: isDesktop ? null : () => <MenuButton />,
         }}
       >
         <Stack.Screen

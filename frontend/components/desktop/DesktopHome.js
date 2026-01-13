@@ -21,7 +21,7 @@ import { useTheme } from "../../context/ThemeContext";
 
 const SIDE_CAMERA_URL = `http://${IP_HOST}:3000/api/side-camera`;
 const CAMERA_FEED_URL = `http://${IP_HOST}:3000/api/camera-live`;
-const API_UPDATE_ZONE = `http://${IP_HOST}:3000/api/update-zones`;
+//const API_UPDATE_ZONE = `http://${IP_HOST}:3000/api/update-zones`;
 
 const DesktopHome = ({
   drones,

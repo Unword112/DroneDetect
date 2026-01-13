@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,28 +8,29 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
+const MenuPopover = ({ isVisible, onClose, navigation, onStartEdit, alertCount }) => {
   const menuItems = [
-    { name: "Alert", label: "Alert" },
-    { name: "Report", label: "Report" },
-    { name: "Option", label: "Option" },
-    { name: "Account", label: "Account" },
+    { name: "Alert", label: "Alert", route: "Alert" },
+    { name: "Edit Zone", label: "Edit Zone", action: "edit" }, // ✅ กำหนด action พิเศษ
+    { name: "Report", label: "Report", route: "Report" },
+    { name: "Option", label: "Option", route: "Option" },
+    { name: "Account", label: "Account", route: "Account" },
   ];
 
-  const lastPressTime = useRef(0);
-    const DELAY_MS = 700;
-    
-    const handlePress = (targetRoute) => {
-      const now = Date.now();
-  
-      if (now - lastPressTime.current < DELAY_MS) {
-        console.log("Too fast! Please wait.");
-        return; 
-      }
-  
-      lastPressTime.current = now;
-      navigation.navigate(targetRoute);
-    };
+  const handlePress = (item) => {
+    onClose();
+
+    if (item.action === "edit") {
+        if (onStartEdit) {
+            setTimeout(() => onStartEdit(), 100); 
+        }
+        return;
+    }
+
+    if (item.route && navigation) {
+        navigation.navigate(item.route);
+    }
+  };
 
   return (
     <Modal
@@ -51,7 +52,7 @@ const MenuPopover = ({ isVisible, onClose, onNavigate, alertCount }) => {
                     styles.menuItem,
                     isLastItem && { borderBottomWidth: 0 },
                   ]}
-                  onPress={() => handlePress(item.route)}
+                  onPress={() => handlePress(item)}
                 >
                   <View style={styles.rowBetween}>
                     <Text style={styles.menuText}>{item.label}</Text>
@@ -79,11 +80,11 @@ const styles = StyleSheet.create({
   },
   popoverContainer: {
     position: "absolute",
-    top: 50,
+    top: 60,
     right: 20,
     backgroundColor: "white",
     borderRadius: 10,
-    width: 150,
+    width: 160,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   alertBadgeText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });
