@@ -38,6 +38,7 @@ const HomeScreen = ({ navigation }) => {
 
   const [selectedDrone, setSelectedDrone] = useState(null);
   const [allDroneDetails, setAllDroneDetails] = useState([]);
+  const [dronePaths, setDronePaths] = useState([]);
 
   const [sidebarLevel, setSidebarLevel] = useState(0);
   const [viewMode, setViewMode] = useState("map");
@@ -88,6 +89,10 @@ const HomeScreen = ({ navigation }) => {
           setAlertZone(data.alertZone);
           setLoading(false);
 
+          if (data.realTime) {
+             setDronePaths(data.realTime); 
+          }
+
           if (!mapInitialized.current && data.initialRegion) {
             setinitialRegion(data.initialRegion);
             setMapRegion(data.initialRegion);
@@ -106,6 +111,8 @@ const HomeScreen = ({ navigation }) => {
       return () => clearInterval(interval);
     }, []),
   );
+
+  console.log(dronePaths);
 
   const handleDroneSelect = (basicDroneData) => {
     const detailData = allDroneDetails.find((d) => d.id === basicDroneData.id);
@@ -139,7 +146,8 @@ const HomeScreen = ({ navigation }) => {
     handleRegionChange,
     viewMode,
     setViewMode,
-    mapRef
+    mapRef,
+    dronePaths,
   };
 
   if (isDesktop) {

@@ -67,6 +67,42 @@ let mockDroneData = [
   },
 ];
 
+let mockDroneDetected = [
+  {
+    id: mockDroneDetail[0].id,
+    path: [
+      { lat: 13.7845, lon: 100.551 },
+      { lat: 13.7745, lon: 100.551 },
+      { lat: 13.7645, lon: 100.551 },
+      { lat: 13.7545, lon: 100.551 },
+      { lat: 13.7445, lon: 100.551 },
+      { lat: 13.7345, lon: 100.551 },
+      { lat: 13.7245, lon: 100.551 },
+      { lat: 13.7145, lon: 100.551 },
+      { lat: 13.7045, lon: 100.551 },
+      { lat: 13.6945, lon: 100.551 },
+      { lat: 13.6845, lon: 100.551 },
+      { lat: 13.6745, lon: 100.551 },
+      { lat: 13.6645, lon: 100.551 },
+      { lat: 13.6545, lon: 100.551 },
+    ]
+  },
+  {
+    id: mockDroneDetail[1].id,
+    path: [
+      { lat: 13.788, lon: 100.548 },
+      { lat: 13.778, lon: 100.548 },
+      { lat: 13.768, lon: 100.548 },
+      { lat: 13.758, lon: 100.548 },
+      { lat: 13.748, lon: 100.548 },
+      { lat: 13.738, lon: 100.548 },
+      { lat: 13.728, lon: 100.548 },
+      { lat: 13.718, lon: 100.548 },
+      { lat: 13.708, lon: 100.548 },
+    ]
+  }
+];
+
 let defenseBoundaryCoords = [
   { latitude: 13.785, longitude: 100.548 },
   { latitude: 13.787, longitude: 100.551 },
@@ -121,6 +157,7 @@ app.get("/api/home-data", (req, res) => {
     alertZone: alertZoneCoords,
     initialRegion: initialMapRegion,
     detail: mockDroneDetail,
+    realTime: mockDroneDetected
   });
 });
 

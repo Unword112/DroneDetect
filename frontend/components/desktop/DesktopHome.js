@@ -37,6 +37,7 @@ const DesktopHome = ({
   sidebarLevel,
   setSidebarLevel,
   mapRef,
+  dronePaths,
 }) => {
   const { theme } = useTheme();
   const colors = theme.colors;
@@ -117,11 +118,14 @@ const DesktopHome = ({
           <View style={StyleSheet.absoluteFill}>
             <DroneMap
               ref={mapRef}
-              
+      
               style={{ width: "100%", height: "100%" }}
+
               drones={isEditing ? [] : drones}
               alertZone={isEditing ? [] : alertZone}
               defenseZone={isEditing ? [] : defenseZone}
+              dronePaths={isEditing ? [] : dronePaths}
+
               initialRegion={initialRegion}
               onRegionChange={handleRegionChange}
             >

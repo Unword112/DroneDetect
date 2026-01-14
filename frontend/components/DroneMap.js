@@ -1,11 +1,13 @@
 import React, { forwardRef } from "react";
 import { View, StyleSheet, Image } from "react-native";
 import MapView, { Polygon, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import Geolocation from '@react-native-community/geolocation';
 
 import { grayMapStyle, MAP_COLORS } from "../pages/configscreen/MapColor";
 
 const DroneMap = forwardRef(({
   drones = [],
+  dronePaths = [],
   alertZone = [],
   defenseZone = [],
   initialRegion,
@@ -14,6 +16,9 @@ const DroneMap = forwardRef(({
   children,
   ...props
 }, ref ) => {
+
+  const mapRef = useRef<MapView | null>(null);
+
   return (
     <View style={[styles.container, style]}>
       <MapView
@@ -43,6 +48,19 @@ const DroneMap = forwardRef(({
             fillColor={MAP_COLORS.defense.fill}
           />
         )}
+
+        {dronePaths && dronePaths.map((dronePath) => (
+            <Polyline
+              key={`path-${dronePath.id}`}
+              coordinates={dronePath.path.map(p => ({
+                  latitude: p.lat,   // แปลง lat ใน mock เป็น latitude
+                  longitude: p.lon   // แปลง lon ใน mock เป็น longitude
+              }))}
+              strokeColor="red"      // สีเส้น (ปรับตามใจชอบ หรือใช้ MAP_COLORS)
+              strokeWidth={2}        // ความหนาเส้น
+              lineDashPattern={[5, 5]} // (Optional) ทำให้เป็นเส้นประ ถ้าอยากได้
+            />
+        ))}
 
         {drones.map((drone) => (
           <Marker

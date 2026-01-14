@@ -45,9 +45,6 @@ const TopNavBar = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      {/*<View>
-        <Text style={{ fontSize: 16, color: "blue", paddingRight: 900}}>LOGO</Text>  
-      </View> */}
       
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => {
