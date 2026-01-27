@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const { spawn } = require("child_process");
 const app = express();
 const port = 3000;
 
@@ -48,7 +49,7 @@ let mockDroneDetail = [
   },
 ];
 
-let mockDroneData = [
+let DroneData = [
   {
     id: mockDroneDetail[0].id,
     name: mockDroneDetail[0].name,
@@ -99,14 +100,14 @@ const isPointInPolygon = (lat, lon, polygon) => {
   return inside;
 };
 
-let droneHistoryLogs = mockDroneData.map((drone) => ({
+let droneHistoryLogs = DroneData.map((drone) => ({
   ...drone,
   timestamp: new Date(),
 }));
 
 //Endpoints
 app.get("/api/home-data", (req, res) => {
-  const visibleDrones = mockDroneData.filter((drone) =>
+  const visibleDrones = DroneData.filter((drone) =>
     isPointInPolygon(drone.lat, drone.lon, alertZoneCoords)
   );
 
@@ -188,9 +189,37 @@ app.get("/api/get-image/:filename", (req, res) => {
 });
 
 app.get("/api/camera-live", (req, res) => {
-  const imagePath = path.join(__dirname, "images", "camera_1.jpg");
-  res.sendFile(imagePath, (err) => {
-    if (err) console.error("Error sending camera-live image:", err);
+  res.writeHead(200, {
+    "Content-Type": "multipart/x-mixed-replace; boundary=--myboundary",
+    "Cache-Control": "no-cache",
+    "Connection": "close",
+    "Pragma": "no-cache",
+  });
+
+  const isWin = process.platform === "win32";
+  const isMac = process.platform === "darwin";
+
+  const ffmpegArgs = [
+    "-f", isWin ? "dshow" : (isMac ? "avfoundation" : "v4l2"), 
+    "-framerate", "30",
+    "-i", isWin ? "video=USB2.0 HD UVC WebCam" : "0", 
+    "-f", "mjpeg",
+    "-q:v", "5",
+    "pipe:1"
+  ];
+
+  console.log("Starting Webcam Stream...");
+
+  const ffmpeg = spawn("ffmpeg", ffmpegArgs);
+  ffmpeg.stdout.pipe(res);
+
+  ffmpeg.stderr.on("data", (data) => {
+    console.log(`FFmpeg Log: ${data}`);
+  });
+
+  req.on("close", () => {
+    console.log("Client disconnected, stopping webcam.");
+    ffmpeg.kill();
   });
 });
 

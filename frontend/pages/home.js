@@ -22,8 +22,8 @@ const HomeScreen = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const headerHeight = useHeaderHeight();
 
-  const isDesktop = width >= 1024;
-  const isTablet = width >= 768 && width < 1024;
+  const isDesktop = width >= 1280;
+  const isTablet = width >= 768 && width < 1280;
 
   const mapRef = useRef(null);
 
@@ -93,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
             setMapRegion(data.initialRegion);
             mapInitialized.current = true;
           }
-          console.log(initialRegion);
+          //console.log(initialRegion);
 
           if (data.detail) setAllDroneDetails(data.detail);
         } catch (error) {
@@ -106,6 +106,18 @@ const HomeScreen = ({ navigation }) => {
       return () => clearInterval(interval);
     }, []),
   );
+
+  //log check zone output every 1 second
+  const timestamp = useRef(0);
+  const DELAY_MS = 5000;
+  const now = Date.now();
+
+  if (now - timestamp.current > DELAY_MS) {
+    console.log("defense Zone:", defenseZone);
+    console.log("alert Zone:", alertZone);
+
+    timestamp.current = now; 
+  }
 
   const handleDroneSelect = (basicDroneData) => {
     const detailData = allDroneDetails.find((d) => d.id === basicDroneData.id);

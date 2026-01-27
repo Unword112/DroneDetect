@@ -136,7 +136,7 @@ const DesktopHome = ({
                 { backgroundColor: "black", zIndex: 10 },
               ]}
             >
-              <Image
+              <WebView
                 source={{ uri: CAMERA_FEED_URL }}
                 style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"
@@ -206,7 +206,7 @@ const DesktopHome = ({
                 styles.sidebarToggleBtn,
                 { backgroundColor: colors.surface },
               ]}
-              onPress={() => setSidebarLevel(2)}
+              onPress={() => setSidebarLevel(1)}
             >
               <Ionicons name="list" size={24} color="#007AFF" />
             </TouchableOpacity>

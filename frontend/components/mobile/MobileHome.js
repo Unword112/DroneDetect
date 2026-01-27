@@ -109,7 +109,7 @@ const MobileHome = ({
 
         {viewMode === "camera" && !isEditing && (
           <View style={[StyleSheet.absoluteFill, { backgroundColor: "black", zIndex: 10 }]}>
-            <Image
+            <WebView
               source={{ uri: CAMERA_FEED_URL }}
               style={{ width: "100%", height: "100%" }}
               resizeMode="cover"
